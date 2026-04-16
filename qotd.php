@@ -50,6 +50,10 @@ final class QOTD_Plugin {
 
 		add_filter('manage_' . self::CPT . '_posts_columns', [$instance, 'admin_columns']);
 		add_action('manage_' . self::CPT . '_posts_custom_column', [$instance, 'admin_column_content'], 10, 2);
+
+		add_action('admin_menu', [$instance, 'register_admin_menu']);
+		add_action('admin_enqueue_scripts', [$instance, 'enqueue_admin_export_script']);
+		add_action('admin_post_qotd_import', [$instance, 'handle_import']);
 	}
 
 	public function register_cpt(): void {
@@ -209,10 +213,35 @@ final class QOTD_Plugin {
 
 	public function register_rest(): void {
 		register_rest_route(self::REST_NAMESPACE, self::REST_ROUTE, [
-			'methods' => \WP_REST_Server::READABLE,
-			'callback' => [$this, 'rest_today'],
+			'methods'             => \WP_REST_Server::READABLE,
+			'callback'            => [$this, 'rest_today'],
 			'permission_callback' => '__return_true',
 		]);
+
+		register_rest_route(self::REST_NAMESPACE, '/export', [
+			'methods'             => \WP_REST_Server::READABLE,
+			'callback'            => [$this, 'rest_export'],
+			'permission_callback' => fn() => current_user_can('manage_options'),
+		]);
+	}
+
+	public function rest_export(\WP_REST_Request $request): \WP_REST_Response {
+		$quotes = [];
+
+		foreach ($this->get_published_quote_ids() as $post_id) {
+			$text = (string) get_post_meta($post_id, self::META_TEXT, true);
+			if ($text === '') {
+				continue;
+			}
+
+			$quotes[] = [
+				'text'   => $text,
+				'author' => (string) get_post_meta($post_id, self::META_AUTHOR, true),
+				'extra'  => (string) get_post_meta($post_id, self::META_EXTRA,  true),
+			];
+		}
+
+		return new \WP_REST_Response($quotes, 200);
 	}
 
 	public function rest_today(\WP_REST_Request $request): \WP_REST_Response {
@@ -289,6 +318,256 @@ final class QOTD_Plugin {
 		set_transient('qotd_quote_ids', $ids, DAY_IN_SECONDS);
 		return $ids;
 	}
+
+	// -------------------------------------------------------------------------
+	// Import / Export
+	// -------------------------------------------------------------------------
+
+	public function register_admin_menu(): void {
+		add_submenu_page(
+			'edit.php?post_type=' . self::CPT,
+			__('Import / Export', 'qotd'),
+			__('Import / Export', 'qotd'),
+			'manage_options',
+			'qotd-import-export',
+			[$this, 'render_import_export_page']
+		);
+	}
+
+	public function render_import_export_page(): void {
+		if (!current_user_can('manage_options')) {
+			wp_die(esc_html(__('Keine Berechtigung.', 'qotd')));
+		}
+
+		$redirect_base = admin_url('edit.php?post_type=' . self::CPT . '&page=qotd-import-export');
+
+		// Erfolgs- / Fehlermeldung aus Redirect-Parametern aufbauen
+		$notice = '';
+		if (isset($_GET['qotd_imported'])) {
+			$imported = (int) $_GET['qotd_imported'];
+			$skipped  = isset($_GET['qotd_skipped']) ? (int) $_GET['qotd_skipped'] : 0;
+
+			$parts = [];
+			$parts[] = esc_html(sprintf(
+				_n('%d Zitat importiert', '%d Zitate importiert', $imported, 'qotd'),
+				$imported
+			));
+			if ($skipped > 0) {
+				$parts[] = esc_html(sprintf(
+					_n('%d bereits vorhanden (übersprungen)', '%d bereits vorhanden (übersprungen)', $skipped, 'qotd'),
+					$skipped
+				));
+			}
+			$notice = '<div class="notice notice-success is-dismissible"><p>' . implode(', ', $parts) . '.</p></div>';
+		} elseif (isset($_GET['qotd_import_error'])) {
+			$messages = [
+				'no_file'      => __('Keine Datei ausgewählt.', 'qotd'),
+				'upload_error' => __('Fehler beim Datei-Upload.', 'qotd'),
+				'invalid_type' => __('Ungültiger Dateityp – bitte eine JSON-Datei hochladen.', 'qotd'),
+				'too_large'    => __('Die Datei ist zu groß (max. 2 MB).', 'qotd'),
+				'parse_error'  => __('Die JSON-Datei konnte nicht gelesen werden oder hat ein ungültiges Format.', 'qotd'),
+				'empty'        => __('Die JSON-Datei enthält keine Einträge.', 'qotd'),
+			];
+			$key     = sanitize_key((string) ($_GET['qotd_import_error'] ?? ''));
+			$message = $messages[$key] ?? __('Unbekannter Fehler.', 'qotd');
+			$notice  = '<div class="notice notice-error is-dismissible"><p>' . esc_html($message) . '</p></div>';
+		}
+		?>
+		<div class="wrap">
+			<h1><?php echo esc_html(__('Zitate Import / Export', 'qotd')); ?></h1>
+
+			<?php echo $notice; // phpcs:ignore WordPress.Security.EscapeOutput -- vollständig escapet oben ?>
+
+			<div style="display:grid;grid-template-columns:1fr 1fr;gap:2em;margin-top:1.5em;max-width:900px;">
+
+				<div class="postbox">
+					<div class="postbox-header" style="padding: 0 14px;">
+						<h2 class="hndle"><?php echo esc_html(__('Export', 'qotd')); ?></h2>
+					</div>
+					<div class="inside">
+						<p><?php echo esc_html(__('Alle veröffentlichten Zitate als JSON-Datei herunterladen (Felder: text, author, extra).', 'qotd')); ?></p>
+						<button id="qotd-export-btn" class="button button-primary">
+							<?php echo esc_html(__('JSON exportieren', 'qotd')); ?>
+						</button>
+						<span id="qotd-export-status" style="margin-left:8px;"></span>
+					</div>
+				</div>
+
+				<div class="postbox">
+					<div class="postbox-header" style="padding: 0 14px;">
+						<h2 class="hndle"><?php echo esc_html(__('Import', 'qotd')); ?></h2>
+					</div>
+					<div class="inside">
+						<p><?php echo esc_html(__('JSON-Datei hochladen (Array mit Objekten der Felder text, author, extra). Bereits vorhandene Zitate (gleicher Text) werden übersprungen.', 'qotd')); ?></p>
+						<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" enctype="multipart/form-data">
+							<?php wp_nonce_field('qotd_import', 'qotd_import_nonce'); ?>
+							<input type="hidden" name="action" value="qotd_import">
+							<p><input type="file" name="qotd_csv" accept=".json" required></p>
+							<?php submit_button(__('JSON importieren', 'qotd'), 'primary', 'submit', false); ?>
+						</form>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<?php
+	}
+
+	public function enqueue_admin_export_script(string $hook): void {
+		// Nur auf der Import/Export-Seite laden.
+		// Hook-Name für Untermenü unter einem CPT: {post_type}_page_{menu_slug}
+		if ($hook !== 'qotd_quote_page_qotd-import-export') {
+			return;
+		}
+
+		wp_enqueue_script(
+			'qotd-admin-export',
+			plugins_url('admin-export.js', __FILE__),
+			[],
+			self::VERSION,
+			true
+		);
+
+		wp_localize_script('qotd-admin-export', 'QOTDExport', [
+			'endpoint'     => esc_url_raw(rest_url(self::REST_NAMESPACE . '/export')),
+			'nonce'        => wp_create_nonce('wp_rest'),
+			'filename'     => 'qotd-export-' . gmdate('Y-m-d') . '.json',
+			'labelExport'  => __('JSON exportieren', 'qotd'),
+			'labelLoading' => __('Wird exportiert…', 'qotd'),
+			'labelError'   => __('Fehler beim Export:', 'qotd'),
+		]);
+	}
+
+	public function handle_import(): void {
+		check_admin_referer('qotd_import', 'qotd_import_nonce');
+
+		if (!current_user_can('manage_options')) {
+			wp_die(esc_html(__('Keine Berechtigung.', 'qotd')));
+		}
+
+		$base = admin_url('edit.php?post_type=' . self::CPT . '&page=qotd-import-export');
+
+		// Upload-Fehler prüfen
+		$upload_error = (int) ($_FILES['qotd_csv']['error'] ?? UPLOAD_ERR_NO_FILE);
+
+		if ($upload_error === UPLOAD_ERR_NO_FILE) {
+			wp_safe_redirect($base . '&qotd_import_error=no_file');
+			exit;
+		}
+		if ($upload_error !== UPLOAD_ERR_OK) {
+			wp_safe_redirect($base . '&qotd_import_error=upload_error');
+			exit;
+		}
+
+		$tmp  = (string) ($_FILES['qotd_csv']['tmp_name'] ?? '');
+		$name = (string) ($_FILES['qotd_csv']['name']     ?? '');
+		$size = (int)    ($_FILES['qotd_csv']['size']      ?? 0);
+
+		// Größe (max. 2 MB)
+		if ($size > 2 * 1024 * 1024) {
+			wp_safe_redirect($base . '&qotd_import_error=too_large');
+			exit;
+		}
+
+		// Dateiendung
+		if (strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== 'json') {
+			wp_safe_redirect($base . '&qotd_import_error=invalid_type');
+			exit;
+		}
+
+		// Sicherstellen, dass es ein echter Upload ist
+		if (!is_uploaded_file($tmp)) {
+			wp_safe_redirect($base . '&qotd_import_error=upload_error');
+			exit;
+		}
+
+		// JSON einlesen und dekodieren
+		$raw = file_get_contents($tmp);
+		if ($raw === false) {
+			wp_safe_redirect($base . '&qotd_import_error=parse_error');
+			exit;
+		}
+
+		$items = json_decode($raw, true);
+		if (!is_array($items) || json_last_error() !== JSON_ERROR_NONE) {
+			wp_safe_redirect($base . '&qotd_import_error=parse_error');
+			exit;
+		}
+
+		if (empty($items)) {
+			wp_safe_redirect($base . '&qotd_import_error=empty');
+			exit;
+		}
+
+		// Vorhandene Texte für Duplikat-Prüfung vorladen
+		$existing = $this->get_existing_quote_texts();
+
+		$imported = 0;
+		$skipped  = 0;
+
+		foreach ($items as $item) {
+			if (!is_array($item) || !array_key_exists('text', $item)) {
+				continue;
+			}
+
+			$text   = sanitize_textarea_field(trim((string) $item['text']));
+			$author = isset($item['author']) ? sanitize_text_field(trim((string) $item['author'])) : '';
+			$extra  = isset($item['extra'])  ? sanitize_text_field(trim((string) $item['extra']))  : '';
+
+			if ($text === '') {
+				continue;
+			}
+
+			if (in_array($text, $existing, true)) {
+				$skipped++;
+				continue;
+			}
+
+			// Kurztitel aus dem Zitat-Text (identisch mit autofill_title-Logik)
+			$max   = 80;
+			$short = function_exists('mb_substr') ? mb_substr($text, 0, $max) : substr($text, 0, $max);
+			$len   = function_exists('mb_strlen') ? mb_strlen($text) : strlen($text);
+			$title = $len > $max ? $short . '…' : $short;
+
+			$post_id = wp_insert_post([
+				'post_type'   => self::CPT,
+				'post_status' => 'publish',
+				'post_title'  => $title,
+			], true);
+
+			if (is_wp_error($post_id)) {
+				continue;
+			}
+
+			update_post_meta($post_id, self::META_TEXT,   $text);
+			update_post_meta($post_id, self::META_AUTHOR, $author);
+			update_post_meta($post_id, self::META_EXTRA,  $extra);
+
+			// Innerhalb desselben Imports ebenfalls auf Duplikate prüfen
+			$existing[] = $text;
+			$imported++;
+		}
+
+		if ($imported > 0) {
+			delete_transient('qotd_quote_ids');
+		}
+
+		wp_safe_redirect($base . '&qotd_imported=' . $imported . '&qotd_skipped=' . $skipped);
+		exit;
+	}
+
+	private function get_existing_quote_texts(): array {
+		$texts = [];
+		foreach ($this->get_published_quote_ids() as $post_id) {
+			$text = (string) get_post_meta($post_id, self::META_TEXT, true);
+			if ($text !== '') {
+				$texts[] = $text;
+			}
+		}
+		return $texts;
+	}
+
+	// -------------------------------------------------------------------------
 
 	public function register_block(): void {
 		$build_dir = __DIR__ . '/build';
