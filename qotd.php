@@ -46,6 +46,7 @@ final class QOTD_Plugin {
 		add_shortcode(self::SHORTCODE, [$instance, 'shortcode']);
 
 		add_action('wp_enqueue_scripts', [$instance, 'register_assets']);
+		add_action('init', [$instance, 'register_block']);
 	}
 
 	public function register_cpt(): void {
@@ -262,6 +263,21 @@ final class QOTD_Plugin {
 		$ids = is_array($q->posts) ? array_values(array_filter(array_map('intval', $q->posts))) : [];
 		set_transient('qotd_quote_ids', $ids, DAY_IN_SECONDS);
 		return $ids;
+	}
+
+	public function register_block(): void {
+		$build_dir = __DIR__ . '/build';
+		if ( ! file_exists( $build_dir . '/block.json' ) ) {
+			return;
+		}
+
+		register_block_type( $build_dir, [
+			'render_callback' => [$this, 'render_block'],
+		] );
+	}
+
+	public function render_block( array $attributes ): string {
+		return $this->shortcode( [] );
 	}
 
 	public function register_assets(): void {
