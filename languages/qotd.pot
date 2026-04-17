@@ -173,3 +173,143 @@ msgid "%d already exists (skipped)"
 msgid_plural "%d already exist (skipped)"
 msgstr[0] ""
 msgstr[1] ""
+
+#: qotd.php
+msgid "Help"
+msgstr ""
+
+#: qotd.php
+msgid "QOTD – Help"
+msgstr ""
+
+#: qotd.php
+msgid "Quick Start"
+msgstr ""
+
+#: qotd.php
+msgid "Activate the plugin."
+msgstr ""
+
+#: qotd.php
+msgid "Go to Quotes → Add New and create your first quote."
+msgstr ""
+
+#: qotd.php
+msgid "Add the shortcode [qotd] to any page or post."
+msgstr ""
+
+#: qotd.php
+msgid "The quote of the day changes automatically at midnight."
+msgstr ""
+
+#: qotd.php
+msgid "Shortcode"
+msgstr ""
+
+#: qotd.php
+msgid "Basic usage:"
+msgstr ""
+
+#: qotd.php
+msgid "With a custom CSS class:"
+msgstr ""
+
+#: qotd.php
+msgid "Generated HTML structure:"
+msgstr ""
+
+#: qotd.php
+msgid "Gutenberg Block"
+msgstr ""
+
+#: qotd.php
+msgid "The QOTD block is available in the block editor. It requires the compiled /build directory inside the plugin folder."
+msgstr ""
+
+#: qotd.php
+msgid "The block supports the native WordPress \"Additional CSS class(es)\" field (className). The class is passed directly to the shortcode output."
+msgstr ""
+
+#: qotd.php
+msgid "CSS Customization"
+msgstr ""
+
+#: qotd.php
+msgid "The following CSS classes are available for styling:"
+msgstr ""
+
+#: qotd.php
+msgid "outer container"
+msgstr ""
+
+#: qotd.php
+msgid "quote text"
+msgstr ""
+
+#: qotd.php
+msgid "author and source wrapper"
+msgstr ""
+
+#: qotd.php
+msgid "author name"
+msgstr ""
+
+#: qotd.php
+msgid "source / additional info"
+msgstr ""
+
+#: qotd.php
+msgid "Example:"
+msgstr ""
+
+#: qotd.php
+msgid "REST Endpoint"
+msgstr ""
+
+#: qotd.php
+msgid "URL:"
+msgstr ""
+
+#: qotd.php
+msgid "Method: GET – no authentication required."
+msgstr ""
+
+#: qotd.php
+msgid "Response format:"
+msgstr ""
+
+#: qotd.php
+msgid "The response includes Cache-Control headers. The quote changes at midnight (site timezone)."
+msgstr ""
+
+#: qotd.php
+msgid "Go to Quotes → Import / Export."
+msgstr ""
+
+#: qotd.php
+msgid "Format: JSON array of objects with the fields text (required), author and extra (both optional)."
+msgstr ""
+
+#: qotd.php
+msgid "Quotes with identical text are skipped (duplicate check)."
+msgstr ""
+
+#: qotd.php
+msgid "Maximum file size: 2 MB."
+msgstr ""
+
+#: qotd.php
+msgid "Managing Quotes"
+msgstr ""
+
+#: qotd.php
+msgid "Quotes are stored as plain text only – no HTML, no links."
+msgstr ""
+
+#: qotd.php
+msgid "Line breaks in the text field are preserved in the frontend output (white-space: pre-line)."
+msgstr ""
+
+#: qotd.php
+msgid "If no title is set, one is generated automatically from the first 80 characters of the quote text."
+msgstr ""

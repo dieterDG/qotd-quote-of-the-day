@@ -53,6 +53,7 @@ final class QOTD_Plugin {
 		add_action('manage_' . self::CPT . '_posts_custom_column', [$instance, 'admin_column_content'], 10, 2);
 
 		add_action('admin_menu', [$instance, 'register_admin_menu']);
+		add_action('admin_menu', [$instance, 'register_help_page']);
 		add_action('admin_enqueue_scripts', [$instance, 'enqueue_admin_export_script']);
 		add_action('admin_post_qotd_import', [$instance, 'handle_import']);
 	}
@@ -570,6 +571,167 @@ final class QOTD_Plugin {
 			}
 		}
 		return $texts;
+	}
+
+	// -------------------------------------------------------------------------
+	// Hilfeseite
+	// -------------------------------------------------------------------------
+
+	public function register_help_page(): void {
+		add_submenu_page(
+			'edit.php?post_type=' . self::CPT,
+			__('Help', 'qotd'),
+			__('Help', 'qotd'),
+			'edit_posts',
+			'qotd-help',
+			[$this, 'render_help_page']
+		);
+	}
+
+	public function render_help_page(): void {
+		if (!current_user_can('edit_posts')) {
+			wp_die(esc_html(__('No permission.', 'qotd')));
+		}
+
+		$rest_url  = esc_url(rest_url(self::REST_NAMESPACE . self::REST_ROUTE));
+		$pre_style = 'background:#f6f7f7;border:1px solid #dcdcde;border-radius:2px;'
+		           . 'padding:8px 10px;overflow-x:auto;font-size:13px;line-height:1.6;'
+		           . 'display:block;margin:4px 0 8px;white-space:pre;';
+		?>
+		<div class="wrap">
+			<h1><?php echo esc_html(__('QOTD – Help', 'qotd')); ?></h1>
+			<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5em;margin-top:1.5em;max-width:1100px;">
+
+				<div class="postbox">
+					<div class="postbox-header" style="padding:0 14px;">
+						<h2 class="hndle"><?php echo esc_html(__('Quick Start', 'qotd')); ?></h2>
+					</div>
+					<div class="inside">
+						<ol>
+							<li><?php echo esc_html(__('Activate the plugin.', 'qotd')); ?></li>
+							<li><?php echo esc_html(__('Go to Quotes → Add New and create your first quote.', 'qotd')); ?></li>
+							<li><?php echo esc_html(__('Add the shortcode [qotd] to any page or post.', 'qotd')); ?></li>
+							<li><?php echo esc_html(__('The quote of the day changes automatically at midnight.', 'qotd')); ?></li>
+						</ol>
+					</div>
+				</div>
+
+				<div class="postbox">
+					<div class="postbox-header" style="padding:0 14px;">
+						<h2 class="hndle"><?php echo esc_html(__('Shortcode', 'qotd')); ?></h2>
+					</div>
+					<div class="inside">
+						<p><?php echo esc_html(__('Basic usage:', 'qotd')); ?></p>
+						<pre style="<?php echo esc_attr($pre_style); ?>">[qotd]</pre>
+						<p><?php echo esc_html(__('With a custom CSS class:', 'qotd')); ?></p>
+						<pre style="<?php echo esc_attr($pre_style); ?>">[qotd class="my-style"]</pre>
+						<p><?php echo esc_html(__('Generated HTML structure:', 'qotd')); ?></p>
+						<pre style="<?php echo esc_attr($pre_style); ?>"><?php echo esc_html(
+'<div class="qotd">
+  <div class="qotd__text"></div>
+  <div class="qotd__meta">
+    <span class="qotd__author"></span>
+    <span class="qotd__source"></span>
+  </div>
+</div>'
+						); ?></pre>
+					</div>
+				</div>
+
+				<div class="postbox">
+					<div class="postbox-header" style="padding:0 14px;">
+						<h2 class="hndle"><?php echo esc_html(__('Gutenberg Block', 'qotd')); ?></h2>
+					</div>
+					<div class="inside">
+						<p><?php echo esc_html(__('The QOTD block is available in the block editor. It requires the compiled /build directory inside the plugin folder.', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('The block supports the native WordPress "Additional CSS class(es)" field (className). The class is passed directly to the shortcode output.', 'qotd')); ?></p>
+					</div>
+				</div>
+
+				<div class="postbox">
+					<div class="postbox-header" style="padding:0 14px;">
+						<h2 class="hndle"><?php echo esc_html(__('CSS Customization', 'qotd')); ?></h2>
+					</div>
+					<div class="inside">
+						<p><?php echo esc_html(__('The following CSS classes are available for styling:', 'qotd')); ?></p>
+						<ul style="margin:.5em 0 1em 1.5em;list-style:disc;">
+							<li><code>.qotd</code> – <?php echo esc_html(__('outer container', 'qotd')); ?></li>
+							<li><code>.qotd__text</code> – <?php echo esc_html(__('quote text', 'qotd')); ?></li>
+							<li><code>.qotd__meta</code> – <?php echo esc_html(__('author and source wrapper', 'qotd')); ?></li>
+							<li><code>.qotd__author</code> – <?php echo esc_html(__('author name', 'qotd')); ?></li>
+							<li><code>.qotd__source</code> – <?php echo esc_html(__('source / additional info', 'qotd')); ?></li>
+						</ul>
+						<p><?php echo esc_html(__('Example:', 'qotd')); ?></p>
+						<pre style="<?php echo esc_attr($pre_style); ?>"><?php echo esc_html(
+'.qotd { max-width: 600px; }
+.qotd__text { font-style: italic; font-size: 1.2em; }
+.qotd__author { font-weight: bold; }
+.qotd__source { color: #666; }'
+						); ?></pre>
+					</div>
+				</div>
+
+				<div class="postbox">
+					<div class="postbox-header" style="padding:0 14px;">
+						<h2 class="hndle"><?php echo esc_html(__('REST Endpoint', 'qotd')); ?></h2>
+					</div>
+					<div class="inside">
+						<p><strong><?php echo esc_html(__('URL:', 'qotd')); ?></strong></p>
+						<pre style="<?php echo esc_attr($pre_style); ?>"><?php echo esc_html($rest_url); ?></pre>
+						<p><?php echo esc_html(__('Method: GET – no authentication required.', 'qotd')); ?></p>
+						<p><strong><?php echo esc_html(__('Response format:', 'qotd')); ?></strong></p>
+						<pre style="<?php echo esc_attr($pre_style); ?>"><?php echo esc_html(
+'{
+  "has_quote": true,
+  "text": "...",
+  "author": "...",
+  "extra": "..."
+}'
+						); ?></pre>
+						<p><?php echo esc_html(__('The response includes Cache-Control headers. The quote changes at midnight (site timezone).', 'qotd')); ?></p>
+					</div>
+				</div>
+
+				<div class="postbox">
+					<div class="postbox-header" style="padding:0 14px;">
+						<h2 class="hndle"><?php echo esc_html(__('Import / Export', 'qotd')); ?></h2>
+					</div>
+					<div class="inside">
+						<p><?php echo esc_html(__('Go to Quotes → Import / Export.', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('Format: JSON array of objects with the fields text (required), author and extra (both optional).', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('Example:', 'qotd')); ?></p>
+						<pre style="<?php echo esc_attr($pre_style); ?>"><?php echo esc_html(
+'[
+  {
+    "text": "Quote text",
+    "author": "Author Name",
+    "extra": "Source"
+  }
+]'
+						); ?></pre>
+						<ul style="margin:.5em 0 0 1.5em;list-style:disc;">
+							<li><?php echo esc_html(__('Quotes with identical text are skipped (duplicate check).', 'qotd')); ?></li>
+							<li><?php echo esc_html(__('Maximum file size: 2 MB.', 'qotd')); ?></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="postbox" style="grid-column:1/-1;">
+					<div class="postbox-header" style="padding:0 14px;">
+						<h2 class="hndle"><?php echo esc_html(__('Managing Quotes', 'qotd')); ?></h2>
+					</div>
+					<div class="inside">
+						<ul style="margin:.5em 0 0 1.5em;list-style:disc;">
+							<li><?php echo esc_html(__('Quotes are stored as plain text only – no HTML, no links.', 'qotd')); ?></li>
+							<li><?php echo esc_html(__('Line breaks in the text field are preserved in the frontend output (white-space: pre-line).', 'qotd')); ?></li>
+							<li><?php echo esc_html(__('If no title is set, one is generated automatically from the first 80 characters of the quote text.', 'qotd')); ?></li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<?php
 	}
 
 	// -------------------------------------------------------------------------

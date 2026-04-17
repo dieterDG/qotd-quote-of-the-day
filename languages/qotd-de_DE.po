@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: QOTD 1.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/qotd\n"
 "POT-Creation-Date: 2026-04-17T00:00:00+00:00\n"
-"PO-Revision-Date: 2026-04-17 09:55+0200\n"
+"PO-Revision-Date: 2026-04-17 10:13+0200\n"
 "Last-Translator: Dieter Geiling <dieter@space-in.de>\n"
 "Language-Team: German <de@li.org>\n"
 "Language: de_DE\n"
@@ -174,3 +174,143 @@ msgstr "QOTD (Zitat des Tages)"
 #. Description of the plugin
 msgid "CPT for quotes + display as quote of the day (AJAX/REST, cache-safe)."
 msgstr "CPT für Zitate + Ausgabe als Zitat des Tages (AJAX/REST, cache-sicher)."
+
+#: qotd.php
+msgid "Help"
+msgstr "Anleitung"
+
+#: qotd.php
+msgid "QOTD – Help"
+msgstr "QOTD – Anleitung"
+
+#: qotd.php
+msgid "Quick Start"
+msgstr "Schnellstart"
+
+#: qotd.php
+msgid "Activate the plugin."
+msgstr "Das Plugin aktivieren."
+
+#: qotd.php
+msgid "Go to Quotes → Add New and create your first quote."
+msgstr "Unter Zitate → Neu hinzufügen das erste Zitat anlegen."
+
+#: qotd.php
+msgid "Add the shortcode [qotd] to any page or post."
+msgstr "Den Shortcode [qotd] in eine Seite oder einen Beitrag einfügen."
+
+#: qotd.php
+msgid "The quote of the day changes automatically at midnight."
+msgstr "Das Zitat des Tages wechselt automatisch um Mitternacht."
+
+#: qotd.php
+msgid "Shortcode"
+msgstr "Shortcode"
+
+#: qotd.php
+msgid "Basic usage:"
+msgstr "Grundlegende Verwendung:"
+
+#: qotd.php
+msgid "With a custom CSS class:"
+msgstr "Mit einer eigenen CSS-Klasse:"
+
+#: qotd.php
+msgid "Generated HTML structure:"
+msgstr "Erzeugte HTML-Struktur:"
+
+#: qotd.php
+msgid "Gutenberg Block"
+msgstr "Gutenberg-Block"
+
+#: qotd.php
+msgid "The QOTD block is available in the block editor. It requires the compiled /build directory inside the plugin folder."
+msgstr "Der QOTD-Block ist im Block-Editor verfügbar. Er benötigt das kompilierte /build-Verzeichnis im Plugin-Ordner."
+
+#: qotd.php
+msgid "The block supports the native WordPress \"Additional CSS class(es)\" field (className). The class is passed directly to the shortcode output."
+msgstr "Der Block unterstützt das native WordPress-Feld \"Zusätzliche CSS-Klasse(n)\" (className). Die Klasse wird direkt an die Shortcode-Ausgabe weitergegeben."
+
+#: qotd.php
+msgid "CSS Customization"
+msgstr "CSS-Anpassung"
+
+#: qotd.php
+msgid "The following CSS classes are available for styling:"
+msgstr "Folgende CSS-Klassen stehen zur Gestaltung zur Verfügung:"
+
+#: qotd.php
+msgid "outer container"
+msgstr "äußerer Container"
+
+#: qotd.php
+msgid "quote text"
+msgstr "Zitat-Text"
+
+#: qotd.php
+msgid "author and source wrapper"
+msgstr "Wrapper für Autor und Quelle"
+
+#: qotd.php
+msgid "author name"
+msgstr "Autorenname"
+
+#: qotd.php
+msgid "source / additional info"
+msgstr "Quelle / Zusatz"
+
+#: qotd.php
+msgid "Example:"
+msgstr "Beispiel:"
+
+#: qotd.php
+msgid "REST Endpoint"
+msgstr "REST-Endpunkt"
+
+#: qotd.php
+msgid "URL:"
+msgstr "URL:"
+
+#: qotd.php
+msgid "Method: GET – no authentication required."
+msgstr "Methode: GET – keine Authentifizierung erforderlich."
+
+#: qotd.php
+msgid "Response format:"
+msgstr "Antwortformat:"
+
+#: qotd.php
+msgid "The response includes Cache-Control headers. The quote changes at midnight (site timezone)."
+msgstr "Die Antwort enthält Cache-Control-Header. Das Zitat wechselt um Mitternacht (Website-Zeitzone)."
+
+#: qotd.php
+msgid "Go to Quotes → Import / Export."
+msgstr "Unter Zitate → Import / Export öffnen."
+
+#: qotd.php
+msgid "Format: JSON array of objects with the fields text (required), author and extra (both optional)."
+msgstr "Format: JSON-Array mit Objekten der Felder text (Pflichtfeld), author und extra (beide optional)."
+
+#: qotd.php
+msgid "Quotes with identical text are skipped (duplicate check)."
+msgstr "Zitate mit identischem Text werden übersprungen (Duplikat-Prüfung)."
+
+#: qotd.php
+msgid "Maximum file size: 2 MB."
+msgstr "Maximale Dateigröße: 2 MB."
+
+#: qotd.php
+msgid "Managing Quotes"
+msgstr "Zitate verwalten"
+
+#: qotd.php
+msgid "Quotes are stored as plain text only – no HTML, no links."
+msgstr "Zitate werden ausschließlich als PlainText gespeichert – kein HTML, keine Links."
+
+#: qotd.php
+msgid "Line breaks in the text field are preserved in the frontend output (white-space: pre-line)."
+msgstr "Zeilenumbrüche im Textfeld bleiben in der Frontend-Ausgabe erhalten (white-space: pre-line)."
+
+#: qotd.php
+msgid "If no title is set, one is generated automatically from the first 80 characters of the quote text."
+msgstr "Ist kein Titel gesetzt, wird er automatisch aus den ersten 80 Zeichen des Zitat-Texts generiert."
