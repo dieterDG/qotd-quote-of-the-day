@@ -1,0 +1,176 @@
+# German translation of the QOTD plugin.
+# Copyright (C) 2024 Dieter Geiling
+# This file is distributed under the same license as the QOTD plugin.
+# Dieter Geiling <dieter@space-in.de>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: QOTD 1.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/qotd\n"
+"POT-Creation-Date: 2026-04-17T00:00:00+00:00\n"
+"PO-Revision-Date: 2026-04-17 09:55+0200\n"
+"Last-Translator: Dieter Geiling <dieter@space-in.de>\n"
+"Language-Team: German <de@li.org>\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.9\n"
+"X-Domain: qotd\n"
+
+#: qotd.php
+msgid "Quotes"
+msgstr "Zitate"
+
+#: qotd.php
+msgid "Quote"
+msgstr "Zitat"
+
+#: qotd.php
+msgid "Add New"
+msgstr "Neu hinzufügen"
+
+#: qotd.php
+msgid "Add New Quote"
+msgstr "Neues Zitat hinzufügen"
+
+#: qotd.php
+msgid "Edit Quote"
+msgstr "Zitat bearbeiten"
+
+#: qotd.php
+msgid "New Quote"
+msgstr "Neues Zitat"
+
+#: qotd.php
+msgid "View Quote"
+msgstr "Zitat ansehen"
+
+#: qotd.php
+msgid "Search Quotes"
+msgstr "Zitate suchen"
+
+#: qotd.php
+msgid "No quotes found"
+msgstr "Keine Zitate gefunden"
+
+#: qotd.php
+msgid "No quotes found in Trash"
+msgstr "Keine Zitate im Papierkorb"
+
+#: qotd.php
+msgid "Author"
+msgstr "Autor"
+
+#: qotd.php
+msgid "Additional Info"
+msgstr "Zusatz"
+
+#: qotd.php
+msgid "Quote Details"
+msgstr "Zitat-Details"
+
+#: qotd.php
+msgid "(plain text only, no formatting)"
+msgstr "(nur Text, keine Formatierung)"
+
+#: qotd.php
+msgid "(optional)"
+msgstr "(optional)"
+
+#: qotd.php
+msgid "Note: Only plain text is stored and output (no links, no HTML)."
+msgstr "Hinweis: Es wird ausschließlich PlainText gespeichert und ausgegeben (keine Links, kein HTML)."
+
+#: qotd.php
+msgid "No permission."
+msgstr "Keine Berechtigung."
+
+#: qotd.php
+msgid "Import / Export"
+msgstr "Import / Export"
+
+#: qotd.php
+msgid "Quotes Import / Export"
+msgstr "Zitate Import / Export"
+
+#: qotd.php
+msgid "Export"
+msgstr "Export"
+
+#: qotd.php
+msgid "Download all published quotes as a JSON file (fields: text, author, extra)."
+msgstr "Alle veröffentlichten Zitate als JSON-Datei herunterladen (Felder: text, author, extra)."
+
+#: qotd.php
+msgid "Export JSON"
+msgstr "JSON exportieren"
+
+#: qotd.php
+msgid "Import"
+msgstr "Import"
+
+#: qotd.php
+msgid "Upload a JSON file (array of objects with fields text, author, extra). Existing quotes (same text) will be skipped."
+msgstr "JSON-Datei hochladen (Array mit Objekten der Felder text, author, extra). Bereits vorhandene Zitate (gleicher Text) werden übersprungen."
+
+#: qotd.php
+msgid "Import JSON"
+msgstr "JSON importieren"
+
+#: qotd.php
+msgid "Exporting…"
+msgstr "Wird exportiert…"
+
+#: qotd.php
+msgid "Export error:"
+msgstr "Fehler beim Export:"
+
+#: qotd.php
+msgid "No file selected."
+msgstr "Keine Datei ausgewählt."
+
+#: qotd.php
+msgid "File upload error."
+msgstr "Fehler beim Datei-Upload."
+
+#: qotd.php
+msgid "Invalid file type – please upload a JSON file."
+msgstr "Ungültiger Dateityp – bitte eine JSON-Datei hochladen."
+
+#: qotd.php
+msgid "The file is too large (max. 2 MB)."
+msgstr "Die Datei ist zu groß (max. 2 MB)."
+
+#: qotd.php
+msgid "The JSON file could not be read or has an invalid format."
+msgstr "Die JSON-Datei konnte nicht gelesen werden oder hat ein ungültiges Format."
+
+#: qotd.php
+msgid "The JSON file contains no entries."
+msgstr "Die JSON-Datei enthält keine Einträge."
+
+#: qotd.php
+msgid "Unknown error."
+msgstr "Unbekannter Fehler."
+
+#: qotd.php
+msgid "%d quote imported"
+msgid_plural "%d quotes imported"
+msgstr[0] "%d Zitat importiert"
+msgstr[1] "%d Zitate importiert"
+
+#: qotd.php
+msgid "%d already exists (skipped)"
+msgid_plural "%d already exist (skipped)"
+msgstr[0] "%d bereits vorhanden (übersprungen)"
+msgstr[1] "%d bereits vorhanden (übersprungen)"
+
+#. Plugin Name of the plugin
+msgid "QOTD (Quote of the Day)"
+msgstr "QOTD (Zitat des Tages)"
+
+#. Description of the plugin
+msgid "CPT for quotes + display as quote of the day (AJAX/REST, cache-safe)."
+msgstr "CPT für Zitate + Ausgabe als Zitat des Tages (AJAX/REST, cache-sicher)."

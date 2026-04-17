@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: QOTD (Zitat des Tages)
- * Description: CPT für Zitate + Ausgabe als Zitat des Tages (AJAX/REST, cache-sicher).
+ * Plugin Name: QOTD (Quote of the Day)
+ * Description: CPT for quotes + display as quote of the day (AJAX/REST, cache-safe).
  * Version: 1.1.0
  * Requires at least: 6.0
  * Requires PHP: 8.0
@@ -35,6 +35,7 @@ final class QOTD_Plugin {
 	public static function init(): void {
 		$instance = new self();
 
+		add_action('init', [$instance, 'load_textdomain']);
 		add_action('init', [$instance, 'register_cpt']);
 		add_action('add_meta_boxes', [$instance, 'register_meta_boxes']);
 		add_action('save_post_' . self::CPT, [$instance, 'save_meta'], 10, 2);
@@ -56,18 +57,22 @@ final class QOTD_Plugin {
 		add_action('admin_post_qotd_import', [$instance, 'handle_import']);
 	}
 
+	public function load_textdomain(): void {
+		load_plugin_textdomain('qotd', false, dirname(plugin_basename(__FILE__)) . '/languages');
+	}
+
 	public function register_cpt(): void {
 		$labels = [
-			'name'               => __('Zitate', 'qotd'),
-			'singular_name'      => __('Zitat', 'qotd'),
-			'add_new'            => __('Neu hinzufügen', 'qotd'),
-			'add_new_item'       => __('Neues Zitat hinzufügen', 'qotd'),
-			'edit_item'          => __('Zitat bearbeiten', 'qotd'),
-			'new_item'           => __('Neues Zitat', 'qotd'),
-			'view_item'          => __('Zitat ansehen', 'qotd'),
-			'search_items'       => __('Zitate suchen', 'qotd'),
-			'not_found'          => __('Keine Zitate gefunden', 'qotd'),
-			'not_found_in_trash' => __('Keine Zitate im Papierkorb', 'qotd'),
+			'name'               => __('Quotes', 'qotd'),
+			'singular_name'      => __('Quote', 'qotd'),
+			'add_new'            => __('Add New', 'qotd'),
+			'add_new_item'       => __('Add New Quote', 'qotd'),
+			'edit_item'          => __('Edit Quote', 'qotd'),
+			'new_item'           => __('New Quote', 'qotd'),
+			'view_item'          => __('View Quote', 'qotd'),
+			'search_items'       => __('Search Quotes', 'qotd'),
+			'not_found'          => __('No quotes found', 'qotd'),
+			'not_found_in_trash' => __('No quotes found in Trash', 'qotd'),
 		];
 
 		register_post_type(self::CPT, [
@@ -97,8 +102,8 @@ final class QOTD_Plugin {
 		foreach ($columns as $key => $label) {
 			$new[$key] = $label;
 			if ($key === 'title') {
-				$new['qotd_author'] = __('Autor', 'qotd');
-				$new['qotd_extra']  = __('Zusatz', 'qotd');
+				$new['qotd_author'] = __('Author', 'qotd');
+				$new['qotd_extra']  = __('Additional Info', 'qotd');
 			}
 		}
 		return $new;
@@ -132,7 +137,7 @@ final class QOTD_Plugin {
 
 		$quote = trim((string) preg_replace('/\s+/', ' ', $quote));
 		if ($quote === '') {
-			$data['post_title'] = __('Zitat', 'qotd') . ' ' . wp_date('Y-m-d H:i');
+			$data['post_title'] = __('Quote', 'qotd') . ' ' . wp_date('Y-m-d H:i');
 			return $data;
 		}
 
@@ -150,7 +155,7 @@ final class QOTD_Plugin {
 	public function register_meta_boxes(): void {
 		add_meta_box(
 			'qotd_meta',
-			__('Zitat-Details', 'qotd'),
+			__('Quote Details', 'qotd'),
 			[$this, 'render_meta_box'],
 			self::CPT,
 			'normal',
@@ -166,19 +171,19 @@ final class QOTD_Plugin {
 		wp_nonce_field(self::NONCE_ACTION, self::NONCE_NAME);
 		?>
 		<p>
-			<label for="qotd_text"><strong><?php echo esc_html(__('Zitat', 'qotd')); ?></strong> <?php echo esc_html(__('(nur Text, keine Formatierung)', 'qotd')); ?></label><br>
+			<label for="qotd_text"><strong><?php echo esc_html(__('Quote', 'qotd')); ?></strong> <?php echo esc_html(__('(plain text only, no formatting)', 'qotd')); ?></label><br>
 			<textarea id="qotd_text" name="qotd_text" rows="6" style="width: 100%;" spellcheck="true"><?php echo esc_textarea($text); ?></textarea>
 		</p>
 		<p>
-			<label for="qotd_author"><strong><?php echo esc_html(__('Autor', 'qotd')); ?></strong></label><br>
+			<label for="qotd_author"><strong><?php echo esc_html(__('Author', 'qotd')); ?></strong></label><br>
 			<input type="text" id="qotd_author" name="qotd_author" value="<?php echo esc_attr($author); ?>" style="width: 100%;" autocomplete="off">
 		</p>
 		<p>
-			<label for="qotd_extra"><strong><?php echo esc_html(__('Zusatz', 'qotd')); ?></strong> <?php echo esc_html(__('(optional)', 'qotd')); ?></label><br>
+			<label for="qotd_extra"><strong><?php echo esc_html(__('Additional Info', 'qotd')); ?></strong> <?php echo esc_html(__('(optional)', 'qotd')); ?></label><br>
 			<input type="text" id="qotd_extra" name="qotd_extra" value="<?php echo esc_attr($extra); ?>" style="width: 100%;" autocomplete="off">
 		</p>
 		<p style="color:#666;">
-			<?php echo esc_html(__('Hinweis: Es wird ausschließlich PlainText gespeichert und ausgegeben (keine Links, kein HTML).', 'qotd')); ?>
+			<?php echo esc_html(__('Note: Only plain text is stored and output (no links, no HTML).', 'qotd')); ?>
 		</p>
 		<?php
 	}
@@ -336,7 +341,7 @@ final class QOTD_Plugin {
 
 	public function render_import_export_page(): void {
 		if (!current_user_can('manage_options')) {
-			wp_die(esc_html(__('Keine Berechtigung.', 'qotd')));
+			wp_die(esc_html(__('No permission.', 'qotd')));
 		}
 
 		$redirect_base = admin_url('edit.php?post_type=' . self::CPT . '&page=qotd-import-export');
@@ -349,32 +354,32 @@ final class QOTD_Plugin {
 
 			$parts = [];
 			$parts[] = esc_html(sprintf(
-				_n('%d Zitat importiert', '%d Zitate importiert', $imported, 'qotd'),
+				_n('%d quote imported', '%d quotes imported', $imported, 'qotd'),
 				$imported
 			));
 			if ($skipped > 0) {
 				$parts[] = esc_html(sprintf(
-					_n('%d bereits vorhanden (übersprungen)', '%d bereits vorhanden (übersprungen)', $skipped, 'qotd'),
+					_n('%d already exists (skipped)', '%d already exist (skipped)', $skipped, 'qotd'),
 					$skipped
 				));
 			}
 			$notice = '<div class="notice notice-success is-dismissible"><p>' . implode(', ', $parts) . '.</p></div>';
 		} elseif (isset($_GET['qotd_import_error'])) {
 			$messages = [
-				'no_file'      => __('Keine Datei ausgewählt.', 'qotd'),
-				'upload_error' => __('Fehler beim Datei-Upload.', 'qotd'),
-				'invalid_type' => __('Ungültiger Dateityp – bitte eine JSON-Datei hochladen.', 'qotd'),
-				'too_large'    => __('Die Datei ist zu groß (max. 2 MB).', 'qotd'),
-				'parse_error'  => __('Die JSON-Datei konnte nicht gelesen werden oder hat ein ungültiges Format.', 'qotd'),
-				'empty'        => __('Die JSON-Datei enthält keine Einträge.', 'qotd'),
+				'no_file'      => __('No file selected.', 'qotd'),
+				'upload_error' => __('File upload error.', 'qotd'),
+				'invalid_type' => __('Invalid file type – please upload a JSON file.', 'qotd'),
+				'too_large'    => __('The file is too large (max. 2 MB).', 'qotd'),
+				'parse_error'  => __('The JSON file could not be read or has an invalid format.', 'qotd'),
+				'empty'        => __('The JSON file contains no entries.', 'qotd'),
 			];
 			$key     = sanitize_key((string) ($_GET['qotd_import_error'] ?? ''));
-			$message = $messages[$key] ?? __('Unbekannter Fehler.', 'qotd');
+			$message = $messages[$key] ?? __('Unknown error.', 'qotd');
 			$notice  = '<div class="notice notice-error is-dismissible"><p>' . esc_html($message) . '</p></div>';
 		}
 		?>
 		<div class="wrap">
-			<h1><?php echo esc_html(__('Zitate Import / Export', 'qotd')); ?></h1>
+			<h1><?php echo esc_html(__('Quotes Import / Export', 'qotd')); ?></h1>
 
 			<?php echo $notice; // phpcs:ignore WordPress.Security.EscapeOutput -- vollständig escapet oben ?>
 
@@ -385,9 +390,9 @@ final class QOTD_Plugin {
 						<h2 class="hndle"><?php echo esc_html(__('Export', 'qotd')); ?></h2>
 					</div>
 					<div class="inside">
-						<p><?php echo esc_html(__('Alle veröffentlichten Zitate als JSON-Datei herunterladen (Felder: text, author, extra).', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('Download all published quotes as a JSON file (fields: text, author, extra).', 'qotd')); ?></p>
 						<button id="qotd-export-btn" class="button button-primary">
-							<?php echo esc_html(__('JSON exportieren', 'qotd')); ?>
+							<?php echo esc_html(__('Export JSON', 'qotd')); ?>
 						</button>
 						<span id="qotd-export-status" style="margin-left:8px;"></span>
 					</div>
@@ -398,12 +403,12 @@ final class QOTD_Plugin {
 						<h2 class="hndle"><?php echo esc_html(__('Import', 'qotd')); ?></h2>
 					</div>
 					<div class="inside">
-						<p><?php echo esc_html(__('JSON-Datei hochladen (Array mit Objekten der Felder text, author, extra). Bereits vorhandene Zitate (gleicher Text) werden übersprungen.', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('Upload a JSON file (array of objects with fields text, author, extra). Existing quotes (same text) will be skipped.', 'qotd')); ?></p>
 						<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" enctype="multipart/form-data">
 							<?php wp_nonce_field('qotd_import', 'qotd_import_nonce'); ?>
 							<input type="hidden" name="action" value="qotd_import">
 							<p><input type="file" name="qotd_csv" accept=".json" required></p>
-							<?php submit_button(__('JSON importieren', 'qotd'), 'primary', 'submit', false); ?>
+							<?php submit_button(__('Import JSON', 'qotd'), 'primary', 'submit', false); ?>
 						</form>
 					</div>
 				</div>
@@ -432,9 +437,9 @@ final class QOTD_Plugin {
 			'endpoint'     => esc_url_raw(rest_url(self::REST_NAMESPACE . '/export')),
 			'nonce'        => wp_create_nonce('wp_rest'),
 			'filename'     => 'qotd-export-' . gmdate('Y-m-d') . '.json',
-			'labelExport'  => __('JSON exportieren', 'qotd'),
-			'labelLoading' => __('Wird exportiert…', 'qotd'),
-			'labelError'   => __('Fehler beim Export:', 'qotd'),
+			'labelExport'  => __('Export JSON', 'qotd'),
+			'labelLoading' => __('Exporting…', 'qotd'),
+			'labelError'   => __('Export error:', 'qotd'),
 		]);
 	}
 
@@ -442,7 +447,7 @@ final class QOTD_Plugin {
 		check_admin_referer('qotd_import', 'qotd_import_nonce');
 
 		if (!current_user_can('manage_options')) {
-			wp_die(esc_html(__('Keine Berechtigung.', 'qotd')));
+			wp_die(esc_html(__('No permission.', 'qotd')));
 		}
 
 		$base = admin_url('edit.php?post_type=' . self::CPT . '&page=qotd-import-export');
