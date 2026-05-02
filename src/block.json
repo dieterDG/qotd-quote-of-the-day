@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "qotd/zitat-des-tages",
+  "version": "1.0.0",
+  "title": "Zitat des Tages",
+  "category": "widgets",
+  "icon": "format-quote",
+  "description": "Zeigt das tägliche Zitat dynamisch per REST-API an.",
+  "textdomain": "qotd",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css"
+}
