@@ -601,6 +601,27 @@ final class QOTD_Plugin {
 			wp_die(esc_html(__('No permission.', 'qotd')));
 		}
 
+		$doc_url = get_locale() === 'de_DE'
+    		? 'https://qotd-plugin.com/de/docs/'
+    		: 'https://qotd-plugin.com/docs/';
+		?>
+		<div class="notice notice-info">
+			<p>
+				<span class="dashicons dashicons-book-alt" style="vertical-align:middle;margin-right:4px;"></span>
+				<?php
+				echo wp_kses(
+					sprintf(
+						/* translators: %s: URL to the online documentation */
+						__('The most up-to-date documentation is available at <a href="%s" target="_blank" rel="noopener noreferrer">qotd-plugin.com/docs</a>.', 'qotd'),
+						esc_url($doc_url)
+					),
+					['a' => ['href' => [], 'target' => [], 'rel' => []]]
+				);
+				?>
+			</p>
+		</div>
+		<?php
+
 		$rest_url  = esc_url(rest_url(self::REST_NAMESPACE . self::REST_ROUTE));
 		$pre_style = 'background:#f6f7f7;border:1px solid #dcdcde;border-radius:2px;'
 		           . 'padding:8px 10px;overflow-x:auto;font-size:13px;line-height:1.6;'
