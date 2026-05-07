@@ -14,11 +14,11 @@ export default function Edit() {
 				className="qotd__text"
 				style={ { whiteSpace: 'pre-line' } }
 			>
-				{ __( 'Zitat des Tages wird hier angezeigt', 'qotd' ) }
+				{ __( 'Quote of the Day will be displayed here', 'qotd' ) }
 			</div>
 			<div className="qotd__meta">
 				<span className="qotd__author">
-					{ __( '— Autor', 'qotd' ) }
+					{ __( '— Author', 'qotd' ) }
 				</span>
 				<span className="qotd__source"></span>
 			</div>

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: QOTD 1.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/qotd\n"
 "POT-Creation-Date: 2026-04-17T00:00:00+00:00\n"
-"PO-Revision-Date: 2026-05-03 18:01+0200\n"
+"PO-Revision-Date: 2026-05-07 20:01+0200\n"
 "Last-Translator: Dieter Geiling <dieter@space-in.de>\n"
 "Language-Team: German <de@li.org>\n"
 "Language: de_DE\n"
@@ -18,6 +18,14 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.9\n"
 "X-Domain: qotd\n"
+
+#. Plugin Name of the plugin
+msgid "QOTD (Quote of the Day)"
+msgstr "QOTD (Zitat des Tages)"
+
+#. Description of the plugin
+msgid "CPT for quotes + display as quote of the day (AJAX/REST, cache-safe)."
+msgstr "CPT für Zitate + Ausgabe als Zitat des Tages (AJAX/REST, cache-sicher)."
 
 #: qotd.php
 msgid "Quotes"
@@ -167,14 +175,6 @@ msgid_plural "%d already exist (skipped)"
 msgstr[0] "%d bereits vorhanden (übersprungen)"
 msgstr[1] "%d bereits vorhanden (übersprungen)"
 
-#. Plugin Name of the plugin
-msgid "QOTD (Quote of the Day)"
-msgstr "QOTD (Zitat des Tages)"
-
-#. Description of the plugin
-msgid "CPT for quotes + display as quote of the day (AJAX/REST, cache-safe)."
-msgstr "CPT für Zitate + Ausgabe als Zitat des Tages (AJAX/REST, cache-sicher)."
-
 #: qotd.php
 msgid "Help"
 msgstr "Anleitung"
@@ -229,7 +229,9 @@ msgstr "Der QOTD-Block ist im Block-Editor verfügbar. Er benötigt das kompilie
 
 #: qotd.php
 msgid "The block supports the native WordPress \"Additional CSS class(es)\" field (className). The class is passed directly to the shortcode output."
-msgstr "Der Block unterstützt das native WordPress-Feld \"Zusätzliche CSS-Klasse(n)\" (className). Die Klasse wird direkt an die Shortcode-Ausgabe weitergegeben."
+msgstr ""
+"Der Block unterstützt das native WordPress-Feld \"Zusätzliche CSS-Klasse(n)\" (className). Die Klasse wird direkt an die Shortcode-Ausgabe "
+"weitergegeben."
 
 #: qotd.php
 msgid "CSS Customization"
@@ -316,5 +318,25 @@ msgid "If no title is set, one is generated automatically from the first 80 char
 msgstr "Ist kein Titel gesetzt, wird er automatisch aus den ersten 80 Zeichen des Zitat-Texts generiert."
 
 #: qotd.php
-msgid "The most up-to-date documentation is available at <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">qotd-plugin.com/docs</a>."
-msgstr "Die aktuellste Dokumentation ist verfügbar unter <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">qotd-plugin.com/de/docs</a>."
+msgid "Optional. If left empty, the title is generated automatically from the first 80 characters of the quote text."
+msgstr "Optional. Wird kein Titel eingetragen, wird er automatisch aus den ersten 80 Zeichen des Zitatextes generiert."
+
+#: src/edit.js
+msgid "Quote of the Day will be displayed here"
+msgstr "Zitat des Tages wird hier angezeigt"
+
+#: src/edit.js
+msgid "— Author"
+msgstr "— Autor"
+
+#: src/block.json
+msgid "Quote of the Day"
+msgstr "Zitat des Tages"
+
+#: src/block.json
+msgid "Displays the daily quote dynamically via REST API."
+msgstr "Zeigt das tägliche Zitat dynamisch per REST-API an."
+
+#: qotd.php
+msgid "The most up-to-date documentation is available at <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a>."
+msgstr "Die aktuellste Dokumentation ist verfügbar unter <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">qotd-plugin.com/de/docs</a>."

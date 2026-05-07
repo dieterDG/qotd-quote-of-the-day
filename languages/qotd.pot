@@ -313,3 +313,7 @@ msgstr ""
 #: qotd.php
 msgid "If no title is set, one is generated automatically from the first 80 characters of the quote text."
 msgstr ""
+
+#: qotd.php
+msgid "Optional. If left empty, the title is generated automatically from the first 80 characters of the quote text."
+msgstr ""

@@ -3,10 +3,11 @@
 /**
  * Plugin Name: QOTD (Quote of the Day)
  * Description: CPT for quotes + display as quote of the day (AJAX/REST, cache-safe).
- * Version: 1.3.2
+ * Version: 1.3.3
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Dieter Geiling
+ * Author URI: https://qotd-plugin.com
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: qotd
@@ -20,7 +21,7 @@ if (!defined('ABSPATH')) {
 
 final class QOTD_Plugin
 {
-	private const VERSION = '1.3.2';
+	private const VERSION = '1.3.3';
 	private const CPT = 'qotd_quote';
 
 	// Plaintext-Metafelder
@@ -51,6 +52,7 @@ final class QOTD_Plugin
 
 		add_action('wp_enqueue_scripts', [$instance, 'register_assets']);
 		add_action('init', [$instance, 'register_block']);
+		add_action('enqueue_block_editor_assets', [$instance, 'set_block_translations']);
 
 		add_filter('manage_' . self::CPT . '_posts_columns', [$instance, 'admin_columns']);
 		add_action('manage_' . self::CPT . '_posts_custom_column', [$instance, 'admin_column_content'], 10, 2);
@@ -60,13 +62,15 @@ final class QOTD_Plugin
 		add_action('admin_enqueue_scripts', [$instance, 'enqueue_admin_export_script']);
 		add_action('admin_post_qotd_import', [$instance, 'handle_import']);
 
+		add_action('edit_form_after_title', [$instance, 'render_title_hint']);
+
 		// Perfmatters REST-API Ausnahme automatisch setzen, falls REST-API via Perfmatters eingeschränkt
 		add_filter('perfmatters_rest_api_exceptions', [$instance, 'perfmatters_exceptions']);
 	}
 
 	public function load_textdomain(): void
 	{
-		load_plugin_textdomain('qotd', false, dirname(plugin_basename(__FILE__)) . '/languages');
+		$result = load_plugin_textdomain('qotd', false, dirname(plugin_basename(__FILE__)) . '/languages');
 	}
 
 	public function register_cpt(): void
@@ -174,6 +178,16 @@ final class QOTD_Plugin
 			'normal',
 			'default'
 		);
+	}
+
+	public function render_title_hint(\WP_Post $post): void
+	{
+		if ($post->post_type !== self::CPT) {
+			return;
+		}
+		echo '<p class="description" style="margin-top:4px;">'
+			. esc_html(__('Optional. If left empty, the title is generated automatically from the first 80 characters of the quote text.', 'qotd'))
+			. '</p>';
 	}
 
 	public function render_meta_box(\WP_Post $post): void
@@ -639,7 +653,7 @@ final class QOTD_Plugin
 			wp_die(esc_html(__('No permission.', 'qotd')));
 		}
 
-		$doc_url = get_locale() === 'de_DE'
+		$doc_url = get_user_locale() === 'de_DE'
 			? 'https://qotd-plugin.com/de/docs/'
 			: 'https://qotd-plugin.com/docs/';
 	?>
@@ -649,9 +663,10 @@ final class QOTD_Plugin
 				<?php
 				echo wp_kses(
 					sprintf(
-						/* translators: %s: URL to the online documentation */
-						__('The most up-to-date documentation is available at <a href="%s" target="_blank" rel="noopener noreferrer">qotd-plugin.com/docs</a>.', 'qotd'),
-						esc_url($doc_url)
+						/* translators: 1: URL to documentation, 2: link label */
+						__('The most up-to-date documentation is available at <a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>.', 'qotd'),
+						esc_url($doc_url),
+						'qotd-plugin.com/docs'   // EN-Fallback; DE-Übersetzung überschreibt den ganzen String
 					),
 					['a' => ['href' => [], 'target' => [], 'rel' => []]]
 				);
@@ -796,6 +811,23 @@ final class QOTD_Plugin
 					</div>
 				</div>
 
+				<div class="postbox" style="grid-column:1/-1;background:#f9f9f9;">
+					<div class="postbox-header" style="padding:0 14px;">
+						<h2 class="hndle">☕ Unterstütze das Projekt</h2>
+					</div>
+					<div class="inside">
+						<p><?php echo esc_html(__('QOTD ist kostenlos. Wenn dir das Plugin hilft, freue ich mich über eine kleine Spende!', 'qotd')); ?></p>
+						<p>
+							<a href="https://ko-fi.com/dieterDG" target="_blank" rel="noopener noreferrer" class="button button-secondary">
+								☕ Ko-fi Spende
+							</a>
+							<a href="https://github.com/sponsors/dieterDG" target="_blank" rel="noopener noreferrer" class="button button-secondary" style="margin-left:8px;">
+								💙 GitHub Sponsors
+							</a>
+						</p>
+					</div>
+				</div>
+
 			</div>
 		</div>
 <?php
@@ -813,6 +845,15 @@ final class QOTD_Plugin
 		register_block_type($build_dir, [
 			'render_callback' => [$this, 'render_block'],
 		]);
+	}
+
+	public function set_block_translations(): void
+	{
+		wp_set_script_translations(
+			'qotd-zitat-des-tages-editor-script',
+			'qotd',
+			plugin_dir_path(__FILE__) . 'languages'
+		);
 	}
 
 	public function render_block(array $attributes): string

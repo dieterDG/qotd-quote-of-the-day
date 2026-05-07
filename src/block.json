@@ -3,10 +3,10 @@
   "apiVersion": 3,
   "name": "qotd/zitat-des-tages",
   "version": "1.0.0",
-  "title": "Zitat des Tages",
+  "title": "Quote of the Day",
   "category": "widgets",
   "icon": "format-quote",
-  "description": "Zeigt das tägliche Zitat dynamisch per REST-API an.",
+  "description": "Displays the daily quote dynamically via REST API.",
   "textdomain": "qotd",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css"
