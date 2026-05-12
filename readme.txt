@@ -113,38 +113,35 @@ Yes. The plugin is fully translated into German (de_DE). The text domain is `qot
 == Changelog ==
 
 = 1.3.3 =
-* Block: Title and block name changed to English ("Quote of the Day") for consistency with the plugin name on wordpress.org. The editor preview text remains translated.
+* Block: Title and block name changed to English ("Quote of the Day") for consistency with the plugin name on wordpress.org. The editor preview text remains translated
 
 = 1.3.2 =
-* Improved daily quote selection: a fallback mechanism now ensures that the same quote never appears on two consecutive days.
+* Improved daily quote selection: a fallback mechanism now ensures that the same quote never appears on two consecutive days
 
 = 1.3.1 =
-* Compatibility: Automatically registers the REST endpoint as an exception when the REST API is restricted via Perfmatters.
+* REST endpoint automatically registered as exception when Perfmatters restricts the REST API
 
 = 1.3.0 =
 * Added CLS-optimized skeleton loader with shimmer animation
 * Dynamic min-height calculation prevents layout shift during quote loading
-* Responsive min-height adjustment for mobile and desktop viewports
-* Improved loading states with fade-in transition
-* CSS custom properties for easy skeleton customization (--qotd-skeleton-base, --qotd-skeleton-shine)
-* Enhanced frontend performance with optimized AJAX loading
 * New qotd.css for skeleton loader styling
+* Responsive min-height adjustment for mobile and desktop viewports
+* CSS custom properties for easy skeleton customization (--qotd-skeleton-base, --qotd-skeleton-shine)
 
 = 1.2.0 =
-* Custom post type `qotd_quote` with plain text meta fields (text, author, extra)
-* Deterministic daily selection via `crc32(date + site_url)`
-* REST API endpoint `/wp-json/qotd/v1/today` with HTTP caching headers
-* Shortcode `[qotd]` with optional `class` parameter
 * Gutenberg block support
 * JSON import and export via admin submenu
 * Admin help / documentation page
 * Auto-generated post title from quote text
-* Transient cache for published quote IDs
-* Full German translation (de_DE)
 * Clean uninstall routine
+* Full German translation (de_DE)
 
 = 1.1.0 =
-* First public release
+* Shortcode with optional class parameter
+* REST API endpoint with HTTP caching headers
+* Deterministic daily selection
+* Custom post type with plain text meta fields
+* Initial release
 
 == Upgrade Notice ==
 
