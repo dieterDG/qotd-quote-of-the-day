@@ -65,7 +65,7 @@ Response:
 
 ## 📚 Documentation
 
-Full documentation is available at **[qotd-plugin.com](https://qotd-plugin.com)**:
+Full documentation is available at **[qotd-plugin.com](https://qotd-plugin.com/docs)**:
 
 - [Installation & Setup](https://qotd-plugin.com/docs/installation)
 - [Shortcode Usage](https://qotd-plugin.com/docs/shortcode)
