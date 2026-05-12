@@ -70,7 +70,7 @@ final class QOTD_Plugin
 
 	public function load_textdomain(): void
 	{
-		$result = load_plugin_textdomain('qotd', false, dirname(plugin_basename(__FILE__)) . '/languages');
+		$result = load_plugin_textdomain('qotd-quote-of-the-day', false, dirname(plugin_basename(__FILE__)) . '/languages');
 	}
 
 	public function register_cpt(): void
