@@ -6,3 +6,4 @@ Thumbs.db
 *.zip
 qotd.php-backup
 wp-cli.phar
+build.sh
