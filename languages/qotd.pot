@@ -322,3 +322,11 @@ msgstr ""
 #. translators: %s: URL to the CSS styling documentation page
 msgid "Interactive examples are available at <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">qotd-plugin.com/docs/css-styling</a>."
 msgstr ""
+
+#: qotd-quote-of-the-day.php
+msgid "dash before author (default: \"— \")"
+msgstr ""
+
+#: qotd-quote-of-the-day.php
+msgid "dot between author and source (default: \" · \")"
+msgstr ""

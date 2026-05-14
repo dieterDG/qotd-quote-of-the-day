@@ -3,7 +3,7 @@
 /**
  * Plugin Name: QOTD - Quote of the Day
  * Description: CPT for quotes + display as quote of the day (AJAX/REST, cache-safe).
- * Version: 1.3.4
+ * Version: 1.3.5
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Dieter Geiling
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 
 final class QOTD_Plugin
 {
-	private const VERSION = '1.3.4';
+	private const VERSION = '1.3.5';
 	private const CPT = 'qotd_quote';
 
 	// Plaintext-Metafelder
@@ -724,7 +724,9 @@ final class QOTD_Plugin
 																				'<div class="qotd">
   <div class="qotd__text"></div>
   <div class="qotd__meta">
+    <span class="qotd__separator"></span>
     <span class="qotd__author"></span>
+    <span class="qotd__divider"></span>
     <span class="qotd__source"></span>
   </div>
 </div>'
@@ -752,7 +754,9 @@ final class QOTD_Plugin
 							<li><code>.qotd</code> – <?php echo esc_html(__('outer container', 'qotd')); ?></li>
 							<li><code>.qotd__text</code> – <?php echo esc_html(__('quote text', 'qotd')); ?></li>
 							<li><code>.qotd__meta</code> – <?php echo esc_html(__('author and source wrapper', 'qotd')); ?></li>
+							<li><code>.qotd__separator</code> – <?php echo esc_html(__('dash before author (default: "— ")', 'qotd')); ?></li>
 							<li><code>.qotd__author</code> – <?php echo esc_html(__('author name', 'qotd')); ?></li>
+							<li><code>.qotd__divider</code> – <?php echo esc_html(__('dot between author and source (default: " · ")', 'qotd')); ?></li>
 							<li><code>.qotd__source</code> – <?php echo esc_html(__('source / additional info', 'qotd')); ?></li>
 						</ul>
 						<p><?php echo esc_html(__('Example:', 'qotd')); ?></p>
@@ -760,7 +764,17 @@ final class QOTD_Plugin
 																				'.qotd { max-width: 600px; }
 .qotd__text { font-style: italic; font-size: 1.2em; }
 .qotd__author { font-weight: bold; }
-.qotd__source { color: #666; }'
+.qotd__source { color: #666; }
+
+/* Hide separators */
+.qotd__separator { display: none; }
+.qotd__divider { display: none; }
+
+/* Replace separators with custom text */
+.qotd__separator { font-size: 0; }
+.qotd__separator::after { content: "– "; font-size: 1rem; }
+.qotd__divider { font-size: 0; }
+.qotd__divider::after { content: " | "; font-size: 1rem; }'
 																			); ?></pre>
 						<p style="margin-top:8px;">
 							<span class="dashicons dashicons-external" style="vertical-align:middle;margin-right:4px;" aria-hidden="true"></span>
@@ -925,8 +939,6 @@ final class QOTD_Plugin
 		// pre-line: Zeilenumbrüche aus PlainText bleiben sichtbar
 		$html .= '<div class="qotd__text" style="white-space:pre-line" aria-live="polite"></div>';
 		$html .= '<div class="qotd__meta">';
-		$html .= '<span class="qotd__author"></span>';
-		$html .= '<span class="qotd__source"></span>';
 		$html .= '</div>';
 		$html .= '</div>';
 

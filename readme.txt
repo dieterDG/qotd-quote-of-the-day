@@ -4,7 +4,7 @@ Tags: quote, quotes, quote of the day, shortcode, daily quote
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.3.4
+Stable tag: 1.3.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,7 +48,9 @@ The plugin does not ship its own frontend CSS. Style the output using your theme
 `.qotd` — outer wrapper
 `.qotd__text` — the quote text
 `.qotd__meta` — wraps author and source
+`.qotd__separator` — dash before author (default: "— ")
 `.qotd__author` — author name
+`.qotd__divider` — dot between author and source (default: " · ")
 `.qotd__source` — optional extra field
 
 == Installation ==
@@ -62,7 +64,7 @@ The shortcode accepts an optional `class` parameter to add a custom CSS class:
 
 `[qotd class="my-style"]`
 
-All styling of the output (`.qotd`, `.qotd__text`, `.qotd__author`, `.qotd__source`) is handled entirely by your theme.
+All styling of the output (`.qotd`, `.qotd__text`, `.qotd__separator`, `.qotd__author`, `.qotd__divider`, `.qotd__source`) is handled entirely by your theme.
 
 == Frequently Asked Questions ==
 
@@ -92,7 +94,7 @@ No. All fields (text, author, extra) are stored and output as plain text only. T
 
 = Can I style the output? =
 
-Yes. The plugin outputs a simple HTML structure with BEM-style CSS classes. Add your own styles in your theme's stylesheet or via the WordPress Customizer. Interactive examples are available at https://qotd-plugin.com/docs/css-styling
+Yes. The plugin outputs a simple HTML structure with BEM-style CSS classes. Separators between author and source (dash and dot) have their own classes and can be hidden or replaced via CSS. Add your own styles in your theme's stylesheet or via the WordPress Customizer. Interactive examples are available at https://qotd-plugin.com/docs/css-styling
 
 = Does the plugin work with the block editor? =
 
@@ -115,6 +117,10 @@ Yes. The plugin is fully translated into German (de_DE). The text domain is `qot
 5. The help / documentation page inside the admin.
 
 == Changelog ==
+
+= 1.3.5 =
+* Separators (dash and dot) are now wrapped in their own BEM elements (`.qotd__separator`, `.qotd__divider`) and can be hidden or replaced via CSS
+* All meta elements (separator, author, divider, source) are now built dynamically by JavaScript — only elements with content are rendered
 
 = 1.3.4 =
 * Fix: Transient cache for quote IDs is now invalidated when a quote is trashed or deleted. Previously, deleting a quote could result in no quote being displayed until the cache expired on its own
@@ -151,6 +157,9 @@ Yes. The plugin is fully translated into German (de_DE). The text domain is `qot
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.3.5 =
+New CSS classes for separator elements. Existing custom CSS continues to work. No manual steps required.
 
 = 1.3.4 =
 Fixes a bug where deleting a quote could leave the frontend empty until the cache expired.

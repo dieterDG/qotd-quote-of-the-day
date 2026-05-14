@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: QOTD 1.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/qotd\n"
 "POT-Creation-Date: 2026-04-17T00:00:00+00:00\n"
-"PO-Revision-Date: 2026-05-10 09:52+0200\n"
+"PO-Revision-Date: 2026-05-14 08:40+0200\n"
 "Last-Translator: Dieter Geiling <dieter@space-in.de>\n"
 "Language-Team: German <de@li.org>\n"
 "Language: de_DE\n"
@@ -343,3 +343,11 @@ msgstr "Die aktuellste Dokumentation ist verfügbar unter <a href=\"%1$s\" targe
 #: qotd.php
 msgid "Interactive examples are available at <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">qotd-plugin.com/docs/css-styling</a>."
 msgstr "Interaktive Beispiele sind verfügbar unter <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">qotd-plugin.com/de/docs/css-anpassung</a>."
+
+#: qotd-quote-of-the-day.php
+msgid "dash before author (default: \"— \")"
+msgstr "Strich vor dem Autor (Standard: \"— \")"
+
+#: qotd-quote-of-the-day.php
+msgid "dot between author and source (default: \" · \")"
+msgstr "Punkt zwischen Autor und Quelle (Standard: \" · \")"

@@ -6,6 +6,13 @@
     el.textContent = text || "";
   }
 
+  function createSeparator(className, text) {
+    var span = document.createElement("span");
+    span.className = className;
+    span.textContent = text;
+    return span;
+  }
+
   async function loadQuote(container) {
     const endpoint = (window.QOTD && window.QOTD.endpoint) ? window.QOTD.endpoint : null;
     if (!endpoint) return;
@@ -25,13 +32,11 @@
 
       const data = await res.json();
       const textEl = container.querySelector(".qotd__text");
-      const authorEl = container.querySelector(".qotd__author");
-      const sourceEl = container.querySelector(".qotd__source");
+      const metaEl = container.querySelector(".qotd__meta");
 
       if (!data || !data.has_quote) {
         setPlain(textEl, "");
-        setPlain(authorEl, "");
-        setPlain(sourceEl, "");
+        if (metaEl) metaEl.innerHTML = "";
         container.removeAttribute("data-qotd-loading");
         container.style.minHeight = '';
         return;
@@ -42,8 +47,32 @@
       const author = (data.author || "").trim();
       const extra = (data.extra || "").trim();
 
-      setPlain(authorEl, author ? "— " + author : "");
-      setPlain(sourceEl, extra ? (author ? " · " : "— ") + extra : "");
+      // Meta-Bereich dynamisch aufbauen mit eigenen Elementen für Trennzeichen
+      if (metaEl) {
+        metaEl.innerHTML = "";
+
+        if (author || extra) {
+          metaEl.appendChild(createSeparator("qotd__separator", "— "));
+        }
+
+        if (author) {
+          var authorEl = document.createElement("span");
+          authorEl.className = "qotd__author";
+          authorEl.textContent = author;
+          metaEl.appendChild(authorEl);
+        }
+
+        if (author && extra) {
+          metaEl.appendChild(createSeparator("qotd__divider", " · "));
+        }
+
+        if (extra) {
+          var sourceEl = document.createElement("span");
+          sourceEl.className = "qotd__source";
+          sourceEl.textContent = extra;
+          metaEl.appendChild(sourceEl);
+        }
+      }
 
       container.removeAttribute("data-qotd-loading");
       
