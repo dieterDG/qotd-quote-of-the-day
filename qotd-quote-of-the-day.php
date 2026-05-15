@@ -62,6 +62,9 @@ final class QOTD_Plugin
 		// Stabile Sortierung in der Admin-Liste: post_date + ID verhindert Duplikate bei Paginierung
 		add_action('pre_get_posts', [$instance, 'stable_admin_sort']);
 
+		// Admin-Suche auf Metafelder erweitern (Autor, Zusatzinfo, Zitattext)
+		add_action('pre_get_posts', [$instance, 'extend_admin_search']);
+
 		add_action('admin_menu', [$instance, 'register_admin_menu']);
 		add_action('admin_menu', [$instance, 'register_help_page']);
 		add_action('admin_enqueue_scripts', [$instance, 'enqueue_admin_export_script']);
@@ -163,6 +166,50 @@ final class QOTD_Plugin
 			$order = $query->get('order') ?: 'DESC';
 			$query->set('orderby', ['date' => $order, 'ID' => $order]);
 		}
+	}
+
+	/**
+	 * Admin-Suche auf Metafelder erweitern.
+	 *
+	 * WordPress durchsucht standardmäßig nur post_title und post_content.
+	 * Da Zitate in Custom Fields gespeichert werden, erweitern wir die
+	 * Suche auf _qotd_text, _qotd_author und _qotd_extra.
+	 */
+	public function extend_admin_search(\WP_Query $query): void
+	{
+		if (!is_admin() || !$query->is_main_query() || !$query->is_search()) {
+			return;
+		}
+		if ($query->get('post_type') !== self::CPT) {
+			return;
+		}
+
+		$search = $query->get('s');
+		if ($search === '') {
+			return;
+		}
+
+		// Suchbegriff aus der Hauptquery entfernen — wir decken alles über meta_query ab
+		$query->set('s', '');
+
+		$query->set('meta_query', [
+			'relation' => 'OR',
+			[
+				'key'     => self::META_TEXT,
+				'value'   => $search,
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => self::META_AUTHOR,
+				'value'   => $search,
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => self::META_EXTRA,
+				'value'   => $search,
+				'compare' => 'LIKE',
+			],
+		]);
 	}
 
 	public function autofill_title(array $data, array $postarr): array
