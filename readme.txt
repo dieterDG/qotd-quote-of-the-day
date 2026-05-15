@@ -102,7 +102,7 @@ Yes, if the `/build` directory with the compiled block files is present. The sho
 
 = What happens when the plugin is deleted? =
 
-The uninstall routine removes all quote post meta entries (`_qotd_text`, `_qotd_author`, `_qotd_extra`) and the transient cache. The custom post type entries themselves follow standard WordPress behavior.
+All plugin data is permanently removed: all quote posts, their meta fields, and the transient cache. Use the export function (Quotes → Import / Export) before deleting the plugin if you want to keep your quotes.
 
 = Is the plugin available in German? =
 

@@ -17,7 +17,7 @@ Display a new quote every day — delivered cache-safely via the WordPress REST 
   - REST API: `/wp-json/qotd/v1/today`
 - 🎨 **Flexible Styling** – BEM-style CSS classes; separators (dash, dot) can be hidden or replaced via CSS; no opinionated theme styles
 - 📤 **Import/Export** – Bulk manage quotes via JSON
-- 🧹 **Clean Uninstall** – Removes all plugin data when deleted
+- 🧹 **Clean Uninstall** – Removes all plugin data when deleted (export your quotes first via Quotes → Import / Export)
 - 🌍 **Translation-Ready** – Fully translated to German (de_DE)
 - 🔒 **XSS-Safe** – Plain text only; no HTML stored or output
 
