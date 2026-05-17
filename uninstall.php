@@ -13,7 +13,7 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 	exit;
 }
 
-$post_ids = get_posts([
+$qotd_post_ids = get_posts([
 	'post_type'      => 'qotd_quote',
 	'post_status'    => 'any',
 	'posts_per_page' => -1,
@@ -21,8 +21,8 @@ $post_ids = get_posts([
 	'no_found_rows'  => true,
 ]);
 
-foreach ($post_ids as $post_id) {
-	wp_delete_post($post_id, true);
+foreach ($qotd_post_ids as $qotd_post_id) {
+	wp_delete_post($qotd_post_id, true);
 }
 
 delete_transient('qotd_quote_ids');

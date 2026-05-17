@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Plugin Name: QOTD - Quote of the Day
  * Description: CPT for quotes + display as quote of the day (AJAX/REST, cache-safe).
@@ -10,15 +12,12 @@
  * Author URI: https://qotd-plugin.com
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: qotd
+ * Text Domain: qotd-quote-of-the-day
  */
-
-declare(strict_types=1);
 
 if (!defined('ABSPATH')) {
 	exit;
 }
-
 final class QOTD_Plugin
 {
 	private const VERSION = '1.3.5';
@@ -39,7 +38,9 @@ final class QOTD_Plugin
 	{
 		$instance = new self();
 
-		add_action('init', [$instance, 'load_textdomain']);
+		add_action('init', function () {
+			load_plugin_textdomain('qotd-quote-of-the-day', false, dirname(plugin_basename(__FILE__)) . '/languages');
+		});
 		add_action('init', [$instance, 'register_cpt']);
 		add_action('add_meta_boxes', [$instance, 'register_meta_boxes']);
 		add_action('save_post_' . self::CPT, [$instance, 'save_meta'], 10, 2);
@@ -76,24 +77,19 @@ final class QOTD_Plugin
 		add_filter('perfmatters_rest_api_exceptions', [$instance, 'perfmatters_exceptions']);
 	}
 
-	public function load_textdomain(): void
-	{
-		$result = load_plugin_textdomain('qotd', false, dirname(plugin_basename(__FILE__)) . '/languages');
-	}
-
 	public function register_cpt(): void
 	{
 		$labels = [
-			'name'               => __('Quotes', 'qotd'),
-			'singular_name'      => __('Quote', 'qotd'),
-			'add_new'            => __('Add New', 'qotd'),
-			'add_new_item'       => __('Add New Quote', 'qotd'),
-			'edit_item'          => __('Edit Quote', 'qotd'),
-			'new_item'           => __('New Quote', 'qotd'),
-			'view_item'          => __('View Quote', 'qotd'),
-			'search_items'       => __('Search Quotes', 'qotd'),
-			'not_found'          => __('No quotes found', 'qotd'),
-			'not_found_in_trash' => __('No quotes found in Trash', 'qotd'),
+			'name'               => __('Quotes', 'qotd-quote-of-the-day'),
+			'singular_name'      => __('Quote', 'qotd-quote-of-the-day'),
+			'add_new'            => __('Add New', 'qotd-quote-of-the-day'),
+			'add_new_item'       => __('Add New Quote', 'qotd-quote-of-the-day'),
+			'edit_item'          => __('Edit Quote', 'qotd-quote-of-the-day'),
+			'new_item'           => __('New Quote', 'qotd-quote-of-the-day'),
+			'view_item'          => __('View Quote', 'qotd-quote-of-the-day'),
+			'search_items'       => __('Search Quotes', 'qotd-quote-of-the-day'),
+			'not_found'          => __('No quotes found', 'qotd-quote-of-the-day'),
+			'not_found_in_trash' => __('No quotes found in Trash', 'qotd-quote-of-the-day'),
 		];
 
 		register_post_type(self::CPT, [
@@ -124,8 +120,8 @@ final class QOTD_Plugin
 		foreach ($columns as $key => $label) {
 			$new[$key] = $label;
 			if ($key === 'title') {
-				$new['qotd_author'] = __('Author', 'qotd');
-				$new['qotd_extra']  = __('Additional Info', 'qotd');
+				$new['qotd_author'] = __('Author', 'qotd-quote-of-the-day');
+				$new['qotd_extra']  = __('Additional Info', 'qotd-quote-of-the-day');
 			}
 		}
 		return $new;
@@ -224,14 +220,17 @@ final class QOTD_Plugin
 		}
 
 		// Metabox-Feld kommt beim Speichern via POST.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in save_meta()
 		$quote = '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in save_meta()
 		if (isset($_POST['qotd_text']) && is_string($_POST['qotd_text'])) {
-			$quote = sanitize_textarea_field($_POST['qotd_text']);
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in save_meta()
+			$quote = sanitize_textarea_field(wp_unslash($_POST['qotd_text']));
 		}
 
 		$quote = trim((string) preg_replace('/\s+/', ' ', $quote));
 		if ($quote === '') {
-			$data['post_title'] = __('Quote', 'qotd') . ' ' . wp_date('Y-m-d H:i');
+			$data['post_title'] = __('Quote', 'qotd-quote-of-the-day') . ' ' . wp_date('Y-m-d H:i');
 			return $data;
 		}
 
@@ -250,7 +249,7 @@ final class QOTD_Plugin
 	{
 		add_meta_box(
 			'qotd_meta',
-			__('Quote Details', 'qotd'),
+			__('Quote Details', 'qotd-quote-of-the-day'),
 			[$this, 'render_meta_box'],
 			self::CPT,
 			'normal',
@@ -264,7 +263,7 @@ final class QOTD_Plugin
 			return;
 		}
 		echo '<p class="description" style="margin-top:4px;">'
-			. esc_html(__('Optional. If left empty, the title is generated automatically from the first 80 characters of the quote text.', 'qotd'))
+			. esc_html(__('Optional. If left empty, the title is generated automatically from the first 80 characters of the quote text.', 'qotd-quote-of-the-day'))
 			. '</p>';
 	}
 
@@ -277,19 +276,19 @@ final class QOTD_Plugin
 		wp_nonce_field(self::NONCE_ACTION, self::NONCE_NAME);
 ?>
 		<p>
-			<label for="qotd_text"><strong><?php echo esc_html(__('Quote', 'qotd')); ?></strong> <?php echo esc_html(__('(plain text only, no formatting)', 'qotd')); ?></label><br>
+			<label for="qotd_text"><strong><?php echo esc_html(__('Quote', 'qotd-quote-of-the-day')); ?></strong> <?php echo esc_html(__('(plain text only, no formatting)', 'qotd-quote-of-the-day')); ?></label><br>
 			<textarea id="qotd_text" name="qotd_text" rows="6" style="width: 100%;" spellcheck="true"><?php echo esc_textarea($text); ?></textarea>
 		</p>
 		<p>
-			<label for="qotd_author"><strong><?php echo esc_html(__('Author', 'qotd')); ?></strong></label><br>
+			<label for="qotd_author"><strong><?php echo esc_html(__('Author', 'qotd-quote-of-the-day')); ?></strong></label><br>
 			<input type="text" id="qotd_author" name="qotd_author" value="<?php echo esc_attr($author); ?>" style="width: 100%;" autocomplete="off">
 		</p>
 		<p>
-			<label for="qotd_extra"><strong><?php echo esc_html(__('Additional Info', 'qotd')); ?></strong> <?php echo esc_html(__('(optional)', 'qotd')); ?></label><br>
+			<label for="qotd_extra"><strong><?php echo esc_html(__('Additional Info', 'qotd-quote-of-the-day')); ?></strong> <?php echo esc_html(__('(optional)', 'qotd-quote-of-the-day')); ?></label><br>
 			<input type="text" id="qotd_extra" name="qotd_extra" value="<?php echo esc_attr($extra); ?>" style="width: 100%;" autocomplete="off">
 		</p>
 		<p style="color:#666;">
-			<?php echo esc_html(__('Note: Only plain text is stored and output (no links, no HTML).', 'qotd')); ?>
+			<?php echo esc_html(__('Note: Only plain text is stored and output (no links, no HTML).', 'qotd-quote-of-the-day')); ?>
 		</p>
 	<?php
 	}
@@ -303,7 +302,7 @@ final class QOTD_Plugin
 			return;
 		}
 
-		$nonce = $_POST[self::NONCE_NAME] ?? '';
+		$nonce = isset($_POST[self::NONCE_NAME]) ? sanitize_text_field(wp_unslash($_POST[self::NONCE_NAME])) : '';
 		if (!is_string($nonce) || !wp_verify_nonce($nonce, self::NONCE_ACTION)) {
 			return;
 		}
@@ -312,9 +311,9 @@ final class QOTD_Plugin
 			return;
 		}
 
-		$text = isset($_POST['qotd_text']) ? sanitize_textarea_field((string) $_POST['qotd_text']) : '';
-		$author = isset($_POST['qotd_author']) ? sanitize_text_field((string) $_POST['qotd_author']) : '';
-		$extra = isset($_POST['qotd_extra']) ? sanitize_text_field((string) $_POST['qotd_extra']) : '';
+		$text = isset($_POST['qotd_text']) ? sanitize_textarea_field(wp_unslash((string) $_POST['qotd_text'])) : '';
+		$author = isset($_POST['qotd_author']) ? sanitize_text_field(wp_unslash((string) $_POST['qotd_author'])) : '';
+		$extra = isset($_POST['qotd_extra']) ? sanitize_text_field(wp_unslash((string) $_POST['qotd_extra'])) : '';
 
 		update_post_meta($post_id, self::META_TEXT, $text);
 		update_post_meta($post_id, self::META_AUTHOR, $author);
@@ -467,8 +466,8 @@ final class QOTD_Plugin
 	{
 		add_submenu_page(
 			'edit.php?post_type=' . self::CPT,
-			__('Import / Export', 'qotd'),
-			__('Import / Export', 'qotd'),
+			__('Import / Export', 'qotd-quote-of-the-day'),
+			__('Import / Export', 'qotd-quote-of-the-day'),
 			'manage_options',
 			'qotd-import-export',
 			[$this, 'render_import_export_page']
@@ -478,45 +477,52 @@ final class QOTD_Plugin
 	public function render_import_export_page(): void
 	{
 		if (!current_user_can('manage_options')) {
-			wp_die(esc_html(__('No permission.', 'qotd')));
+			wp_die(esc_html(__('No permission.', 'qotd-quote-of-the-day')));
 		}
 
 		$redirect_base = admin_url('edit.php?post_type=' . self::CPT . '&page=qotd-import-export');
 
 		// Erfolgs- / Fehlermeldung aus Redirect-Parametern aufbauen
 		$notice = '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Integer-Cast, Werte kommen aus eigenem wp_safe_redirect
 		if (isset($_GET['qotd_imported'])) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Integer-Cast, Werte kommen aus eigenem wp_safe_redirect
 			$imported = (int) $_GET['qotd_imported'];
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Integer-Cast, Werte kommen aus eigenem wp_safe_redirect
 			$skipped  = isset($_GET['qotd_skipped']) ? (int) $_GET['qotd_skipped'] : 0;
 
 			$parts = [];
 			$parts[] = esc_html(sprintf(
-				_n('%d quote imported', '%d quotes imported', $imported, 'qotd'),
+				// translators: %d: number of quotes imported
+				_n('%d quote imported', '%d quotes imported', $imported, 'qotd-quote-of-the-day'),
 				$imported
 			));
 			if ($skipped > 0) {
 				$parts[] = esc_html(sprintf(
-					_n('%d already exists (skipped)', '%d already exist (skipped)', $skipped, 'qotd'),
+					// translators: %d: number of duplicate quotes skipped
+					_n('%d already exists (skipped)', '%d already exist (skipped)', $skipped, 'qotd-quote-of-the-day'),
 					$skipped
 				));
 			}
 			$notice = '<div class="notice notice-success is-dismissible"><p>' . implode(', ', $parts) . '.</p></div>';
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- sanitize_key angewendet, Werte kommen aus eigenem wp_safe_redirect
 		} elseif (isset($_GET['qotd_import_error'])) {
 			$messages = [
-				'no_file'      => __('No file selected.', 'qotd'),
-				'upload_error' => __('File upload error.', 'qotd'),
-				'invalid_type' => __('Invalid file type – please upload a JSON file.', 'qotd'),
-				'too_large'    => __('The file is too large (max. 2 MB).', 'qotd'),
-				'parse_error'  => __('The JSON file could not be read or has an invalid format.', 'qotd'),
-				'empty'        => __('The JSON file contains no entries.', 'qotd'),
+				'no_file'      => __('No file selected.', 'qotd-quote-of-the-day'),
+				'upload_error' => __('File upload error.', 'qotd-quote-of-the-day'),
+				'invalid_type' => __('Invalid file type – please upload a JSON file.', 'qotd-quote-of-the-day'),
+				'too_large'    => __('The file is too large (max. 2 MB).', 'qotd-quote-of-the-day'),
+				'parse_error'  => __('The JSON file could not be read or has an invalid format.', 'qotd-quote-of-the-day'),
+				'empty'        => __('The JSON file contains no entries.', 'qotd-quote-of-the-day'),
 			];
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- sanitize_key angewendet, Werte kommen aus eigenem wp_safe_redirect
 			$key     = sanitize_key((string) ($_GET['qotd_import_error'] ?? ''));
-			$message = $messages[$key] ?? __('Unknown error.', 'qotd');
+			$message = $messages[$key] ?? __('Unknown error.', 'qotd-quote-of-the-day');
 			$notice  = '<div class="notice notice-error is-dismissible"><p>' . esc_html($message) . '</p></div>';
 		}
 	?>
 		<div class="wrap">
-			<h1><?php echo esc_html(__('Quotes Import / Export', 'qotd')); ?></h1>
+			<h1><?php echo esc_html(__('Quotes Import / Export', 'qotd-quote-of-the-day')); ?></h1>
 
 			<?php echo $notice; // phpcs:ignore WordPress.Security.EscapeOutput -- vollständig escapet oben 
 			?>
@@ -525,12 +531,12 @@ final class QOTD_Plugin
 
 				<div class="postbox">
 					<div class="postbox-header" style="padding: 0 14px;">
-						<h2 class="hndle"><?php echo esc_html(__('Export', 'qotd')); ?></h2>
+						<h2 class="hndle"><?php echo esc_html(__('Export', 'qotd-quote-of-the-day')); ?></h2>
 					</div>
 					<div class="inside">
-						<p><?php echo esc_html(__('Download all published quotes as a JSON file (fields: text, author, extra).', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('Download all published quotes as a JSON file (fields: text, author, extra).', 'qotd-quote-of-the-day')); ?></p>
 						<button id="qotd-export-btn" class="button button-primary">
-							<?php echo esc_html(__('Export JSON', 'qotd')); ?>
+							<?php echo esc_html(__('Export JSON', 'qotd-quote-of-the-day')); ?>
 						</button>
 						<span id="qotd-export-status" style="margin-left:8px;"></span>
 					</div>
@@ -538,15 +544,15 @@ final class QOTD_Plugin
 
 				<div class="postbox">
 					<div class="postbox-header" style="padding: 0 14px;">
-						<h2 class="hndle"><?php echo esc_html(__('Import', 'qotd')); ?></h2>
+						<h2 class="hndle"><?php echo esc_html(__('Import', 'qotd-quote-of-the-day')); ?></h2>
 					</div>
 					<div class="inside">
-						<p><?php echo esc_html(__('Upload a JSON file (array of objects with fields text, author, extra). Existing quotes (same text) will be skipped.', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('Upload a JSON file (array of objects with fields text, author, extra). Existing quotes (same text) will be skipped.', 'qotd-quote-of-the-day')); ?></p>
 						<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" enctype="multipart/form-data">
 							<?php wp_nonce_field('qotd_import', 'qotd_import_nonce'); ?>
 							<input type="hidden" name="action" value="qotd_import">
 							<p><input type="file" name="qotd_csv" accept=".json" required></p>
-							<?php submit_button(__('Import JSON', 'qotd'), 'primary', 'submit', false); ?>
+							<?php submit_button(__('Import JSON', 'qotd-quote-of-the-day'), 'primary', 'submit', false); ?>
 						</form>
 					</div>
 				</div>
@@ -576,9 +582,9 @@ final class QOTD_Plugin
 			'endpoint'     => esc_url_raw(rest_url(self::REST_NAMESPACE . '/export')),
 			'nonce'        => wp_create_nonce('wp_rest'),
 			'filename'     => 'qotd-export-' . gmdate('Y-m-d') . '.json',
-			'labelExport'  => __('Export JSON', 'qotd'),
-			'labelLoading' => __('Exporting…', 'qotd'),
-			'labelError'   => __('Export error:', 'qotd'),
+			'labelExport'  => __('Export JSON', 'qotd-quote-of-the-day'),
+			'labelLoading' => __('Exporting…', 'qotd-quote-of-the-day'),
+			'labelError'   => __('Export error:', 'qotd-quote-of-the-day'),
 		]);
 	}
 
@@ -587,12 +593,13 @@ final class QOTD_Plugin
 		check_admin_referer('qotd_import', 'qotd_import_nonce');
 
 		if (!current_user_can('manage_options')) {
-			wp_die(esc_html(__('No permission.', 'qotd')));
+			wp_die(esc_html(__('No permission.', 'qotd-quote-of-the-day')));
 		}
 
 		$base = admin_url('edit.php?post_type=' . self::CPT . '&page=qotd-import-export');
 
 		// Upload-Fehler prüfen
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$upload_error = (int) ($_FILES['qotd_csv']['error'] ?? UPLOAD_ERR_NO_FILE);
 
 		if ($upload_error === UPLOAD_ERR_NO_FILE) {
@@ -604,9 +611,11 @@ final class QOTD_Plugin
 			exit;
 		}
 
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$tmp  = (string) ($_FILES['qotd_csv']['tmp_name'] ?? '');
-		$name = (string) ($_FILES['qotd_csv']['name']     ?? '');
-		$size = (int)    ($_FILES['qotd_csv']['size']      ?? 0);
+		$name = sanitize_file_name(wp_unslash((string) ($_FILES['qotd_csv']['name'] ?? '')));
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$size = (int) ($_FILES['qotd_csv']['size'] ?? 0);
 
 		// Größe (max. 2 MB)
 		if ($size > 2 * 1024 * 1024) {
@@ -727,8 +736,8 @@ final class QOTD_Plugin
 	{
 		add_submenu_page(
 			'edit.php?post_type=' . self::CPT,
-			__('Help', 'qotd'),
-			__('Help', 'qotd'),
+			__('Help', 'qotd-quote-of-the-day'),
+			__('Help', 'qotd-quote-of-the-day'),
 			'edit_posts',
 			'qotd-help',
 			[$this, 'render_help_page']
@@ -738,7 +747,7 @@ final class QOTD_Plugin
 	public function render_help_page(): void
 	{
 		if (!current_user_can('edit_posts')) {
-			wp_die(esc_html(__('No permission.', 'qotd')));
+			wp_die(esc_html(__('No permission.', 'qotd-quote-of-the-day')));
 		}
 
 		$doc_url = get_user_locale() === 'de_DE'
@@ -752,7 +761,7 @@ final class QOTD_Plugin
 				echo wp_kses(
 					sprintf(
 						/* translators: 1: URL to documentation, 2: link label */
-						__('The most up-to-date documentation is available at <a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>.', 'qotd'),
+						__('The most up-to-date documentation is available at <a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>.', 'qotd-quote-of-the-day'),
 						esc_url($doc_url),
 						'qotd-plugin.com/docs'   // EN-Fallback; DE-Übersetzung überschreibt den ganzen String
 					),
@@ -769,33 +778,33 @@ final class QOTD_Plugin
 			. 'display:block;margin:4px 0 8px;white-space:pre;';
 		?>
 		<div class="wrap">
-			<h1><?php echo esc_html(__('QOTD – Help', 'qotd')); ?></h1>
+			<h1><?php echo esc_html(__('QOTD – Help', 'qotd-quote-of-the-day')); ?></h1>
 			<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5em;margin-top:1.5em;max-width:1100px;">
 
 				<div class="postbox">
 					<div class="postbox-header" style="padding:0 14px;">
-						<h2 class="hndle"><?php echo esc_html(__('Quick Start', 'qotd')); ?></h2>
+						<h2 class="hndle"><?php echo esc_html(__('Quick Start', 'qotd-quote-of-the-day')); ?></h2>
 					</div>
 					<div class="inside">
 						<ol>
-							<li><?php echo esc_html(__('Activate the plugin.', 'qotd')); ?></li>
-							<li><?php echo esc_html(__('Go to Quotes → Add New and create your first quote.', 'qotd')); ?></li>
-							<li><?php echo esc_html(__('Add the shortcode [qotd] to any page or post.', 'qotd')); ?></li>
-							<li><?php echo esc_html(__('The quote of the day changes automatically at midnight.', 'qotd')); ?></li>
+							<li><?php echo esc_html(__('Activate the plugin.', 'qotd-quote-of-the-day')); ?></li>
+							<li><?php echo esc_html(__('Go to Quotes → Add New and create your first quote.', 'qotd-quote-of-the-day')); ?></li>
+							<li><?php echo esc_html(__('Add the shortcode [qotd] to any page or post.', 'qotd-quote-of-the-day')); ?></li>
+							<li><?php echo esc_html(__('The quote of the day changes automatically at midnight.', 'qotd-quote-of-the-day')); ?></li>
 						</ol>
 					</div>
 				</div>
 
 				<div class="postbox">
 					<div class="postbox-header" style="padding:0 14px;">
-						<h2 class="hndle"><?php echo esc_html(__('Shortcode', 'qotd')); ?></h2>
+						<h2 class="hndle"><?php echo esc_html(__('Shortcode', 'qotd-quote-of-the-day')); ?></h2>
 					</div>
 					<div class="inside">
-						<p><?php echo esc_html(__('Basic usage:', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('Basic usage:', 'qotd-quote-of-the-day')); ?></p>
 						<pre style="<?php echo esc_attr($pre_style); ?>">[qotd]</pre>
-						<p><?php echo esc_html(__('With a custom CSS class:', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('With a custom CSS class:', 'qotd-quote-of-the-day')); ?></p>
 						<pre style="<?php echo esc_attr($pre_style); ?>">[qotd class="my-style"]</pre>
-						<p><?php echo esc_html(__('Generated HTML structure:', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('Generated HTML structure:', 'qotd-quote-of-the-day')); ?></p>
 						<pre style="<?php echo esc_attr($pre_style); ?>"><?php echo esc_html(
 																				'<div class="qotd">
   <div class="qotd__text"></div>
@@ -812,30 +821,30 @@ final class QOTD_Plugin
 
 				<div class="postbox">
 					<div class="postbox-header" style="padding:0 14px;">
-						<h2 class="hndle"><?php echo esc_html(__('Gutenberg Block', 'qotd')); ?></h2>
+						<h2 class="hndle"><?php echo esc_html(__('Gutenberg Block', 'qotd-quote-of-the-day')); ?></h2>
 					</div>
 					<div class="inside">
-						<p><?php echo esc_html(__('The QOTD block is available in the block editor. It requires the compiled /build directory inside the plugin folder.', 'qotd')); ?></p>
-						<p><?php echo esc_html(__('The block supports the native WordPress "Additional CSS class(es)" field (className). The class is passed directly to the shortcode output.', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('The QOTD block is available in the block editor. It requires the compiled /build directory inside the plugin folder.', 'qotd-quote-of-the-day')); ?></p>
+						<p><?php echo esc_html(__('The block supports the native WordPress "Additional CSS class(es)" field (className). The class is passed directly to the shortcode output.', 'qotd-quote-of-the-day')); ?></p>
 					</div>
 				</div>
 
 				<div class="postbox">
 					<div class="postbox-header" style="padding:0 14px;">
-						<h2 class="hndle"><?php echo esc_html(__('CSS Customization', 'qotd')); ?></h2>
+						<h2 class="hndle"><?php echo esc_html(__('CSS Customization', 'qotd-quote-of-the-day')); ?></h2>
 					</div>
 					<div class="inside">
-						<p><?php echo esc_html(__('The following CSS classes are available for styling:', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('The following CSS classes are available for styling:', 'qotd-quote-of-the-day')); ?></p>
 						<ul style="margin:.5em 0 1em 1.5em;list-style:disc;">
-							<li><code>.qotd</code> – <?php echo esc_html(__('outer container', 'qotd')); ?></li>
-							<li><code>.qotd__text</code> – <?php echo esc_html(__('quote text', 'qotd')); ?></li>
-							<li><code>.qotd__meta</code> – <?php echo esc_html(__('author and source wrapper', 'qotd')); ?></li>
-							<li><code>.qotd__separator</code> – <?php echo esc_html(__('dash before author (default: "— ")', 'qotd')); ?></li>
-							<li><code>.qotd__author</code> – <?php echo esc_html(__('author name', 'qotd')); ?></li>
-							<li><code>.qotd__divider</code> – <?php echo esc_html(__('dot between author and source (default: " · ")', 'qotd')); ?></li>
-							<li><code>.qotd__source</code> – <?php echo esc_html(__('source / additional info', 'qotd')); ?></li>
+							<li><code>.qotd</code> – <?php echo esc_html(__('outer container', 'qotd-quote-of-the-day')); ?></li>
+							<li><code>.qotd__text</code> – <?php echo esc_html(__('quote text', 'qotd-quote-of-the-day')); ?></li>
+							<li><code>.qotd__meta</code> – <?php echo esc_html(__('author and source wrapper', 'qotd-quote-of-the-day')); ?></li>
+							<li><code>.qotd__separator</code> – <?php echo esc_html(__('dash before author (default: "— ")', 'qotd-quote-of-the-day')); ?></li>
+							<li><code>.qotd__author</code> – <?php echo esc_html(__('author name', 'qotd-quote-of-the-day')); ?></li>
+							<li><code>.qotd__divider</code> – <?php echo esc_html(__('dot between author and source (default: " · ")', 'qotd-quote-of-the-day')); ?></li>
+							<li><code>.qotd__source</code> – <?php echo esc_html(__('source / additional info', 'qotd-quote-of-the-day')); ?></li>
 						</ul>
-						<p><?php echo esc_html(__('Example:', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('Example:', 'qotd-quote-of-the-day')); ?></p>
 						<pre style="<?php echo esc_attr($pre_style); ?>"><?php echo esc_html(
 																				'.qotd { max-width: 600px; }
 .qotd__text { font-style: italic; font-size: 1.2em; }
@@ -861,7 +870,7 @@ final class QOTD_Plugin
 							echo wp_kses(
 								sprintf(
 									/* translators: %s: URL to the CSS styling documentation page */
-									__('Interactive examples are available at <a href="%s" target="_blank" rel="noopener noreferrer">qotd-plugin.com/docs/css-styling</a>.', 'qotd'),
+									__('Interactive examples are available at <a href="%s" target="_blank" rel="noopener noreferrer">qotd-plugin.com/docs/css-styling</a>.', 'qotd-quote-of-the-day'),
 									esc_url($css_doc_url)
 								),
 								['a' => ['href' => [], 'target' => [], 'rel' => []]]
@@ -873,13 +882,13 @@ final class QOTD_Plugin
 
 				<div class="postbox">
 					<div class="postbox-header" style="padding:0 14px;">
-						<h2 class="hndle"><?php echo esc_html(__('REST Endpoint', 'qotd')); ?></h2>
+						<h2 class="hndle"><?php echo esc_html(__('REST Endpoint', 'qotd-quote-of-the-day')); ?></h2>
 					</div>
 					<div class="inside">
-						<p><strong><?php echo esc_html(__('URL:', 'qotd')); ?></strong></p>
+						<p><strong><?php echo esc_html(__('URL:', 'qotd-quote-of-the-day')); ?></strong></p>
 						<pre style="<?php echo esc_attr($pre_style); ?>"><?php echo esc_html($rest_url); ?></pre>
-						<p><?php echo esc_html(__('Method: GET – no authentication required.', 'qotd')); ?></p>
-						<p><strong><?php echo esc_html(__('Response format:', 'qotd')); ?></strong></p>
+						<p><?php echo esc_html(__('Method: GET – no authentication required.', 'qotd-quote-of-the-day')); ?></p>
+						<p><strong><?php echo esc_html(__('Response format:', 'qotd-quote-of-the-day')); ?></strong></p>
 						<pre style="<?php echo esc_attr($pre_style); ?>"><?php echo esc_html(
 																				'{
   "has_quote": true,
@@ -888,18 +897,18 @@ final class QOTD_Plugin
   "extra": "..."
 }'
 																			); ?></pre>
-						<p><?php echo esc_html(__('The response includes Cache-Control headers. The quote changes at midnight (site timezone).', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('The response includes Cache-Control headers. The quote changes at midnight (site timezone).', 'qotd-quote-of-the-day')); ?></p>
 					</div>
 				</div>
 
 				<div class="postbox">
 					<div class="postbox-header" style="padding:0 14px;">
-						<h2 class="hndle"><?php echo esc_html(__('Import / Export', 'qotd')); ?></h2>
+						<h2 class="hndle"><?php echo esc_html(__('Import / Export', 'qotd-quote-of-the-day')); ?></h2>
 					</div>
 					<div class="inside">
-						<p><?php echo esc_html(__('Go to Quotes → Import / Export.', 'qotd')); ?></p>
-						<p><?php echo esc_html(__('Format: JSON array of objects with the fields text (required), author and extra (both optional).', 'qotd')); ?></p>
-						<p><?php echo esc_html(__('Example:', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('Go to Quotes → Import / Export.', 'qotd-quote-of-the-day')); ?></p>
+						<p><?php echo esc_html(__('Format: JSON array of objects with the fields text (required), author and extra (both optional).', 'qotd-quote-of-the-day')); ?></p>
+						<p><?php echo esc_html(__('Example:', 'qotd-quote-of-the-day')); ?></p>
 						<pre style="<?php echo esc_attr($pre_style); ?>"><?php echo esc_html(
 																				'[
   {
@@ -910,21 +919,21 @@ final class QOTD_Plugin
 ]'
 																			); ?></pre>
 						<ul style="margin:.5em 0 0 1.5em;list-style:disc;">
-							<li><?php echo esc_html(__('Quotes with identical text are skipped (duplicate check).', 'qotd')); ?></li>
-							<li><?php echo esc_html(__('Maximum file size: 2 MB.', 'qotd')); ?></li>
+							<li><?php echo esc_html(__('Quotes with identical text are skipped (duplicate check).', 'qotd-quote-of-the-day')); ?></li>
+							<li><?php echo esc_html(__('Maximum file size: 2 MB.', 'qotd-quote-of-the-day')); ?></li>
 						</ul>
 					</div>
 				</div>
 
 				<div class="postbox" style="grid-column:1/-1;">
 					<div class="postbox-header" style="padding:0 14px;">
-						<h2 class="hndle"><?php echo esc_html(__('Managing Quotes', 'qotd')); ?></h2>
+						<h2 class="hndle"><?php echo esc_html(__('Managing Quotes', 'qotd-quote-of-the-day')); ?></h2>
 					</div>
 					<div class="inside">
 						<ul style="margin:.5em 0 0 1.5em;list-style:disc;">
-							<li><?php echo esc_html(__('Quotes are stored as plain text only – no HTML, no links.', 'qotd')); ?></li>
-							<li><?php echo esc_html(__('Line breaks in the text field are preserved in the frontend output (white-space: pre-line).', 'qotd')); ?></li>
-							<li><?php echo esc_html(__('If no title is set, one is generated automatically from the first 80 characters of the quote text.', 'qotd')); ?></li>
+							<li><?php echo esc_html(__('Quotes are stored as plain text only – no HTML, no links.', 'qotd-quote-of-the-day')); ?></li>
+							<li><?php echo esc_html(__('Line breaks in the text field are preserved in the frontend output (white-space: pre-line).', 'qotd-quote-of-the-day')); ?></li>
+							<li><?php echo esc_html(__('If no title is set, one is generated automatically from the first 80 characters of the quote text.', 'qotd-quote-of-the-day')); ?></li>
 						</ul>
 					</div>
 				</div>
@@ -934,7 +943,7 @@ final class QOTD_Plugin
 						<h2 class="hndle">☕ Unterstütze das Projekt</h2>
 					</div>
 					<div class="inside">
-						<p><?php echo esc_html(__('QOTD ist kostenlos. Wenn dir das Plugin hilft, freue ich mich über eine kleine Spende!', 'qotd')); ?></p>
+						<p><?php echo esc_html(__('QOTD ist kostenlos. Wenn dir das Plugin hilft, freue ich mich über eine kleine Spende!', 'qotd-quote-of-the-day')); ?></p>
 						<p>
 							<a href="https://ko-fi.com/dieterDG" target="_blank" rel="noopener noreferrer" class="button button-secondary">
 								☕ Ko-fi Spende
@@ -969,7 +978,7 @@ final class QOTD_Plugin
 	{
 		wp_set_script_translations(
 			'qotd-zitat-des-tages-editor-script',
-			'qotd',
+			'qotd-quote-of-the-day',
 			plugin_dir_path(__FILE__) . 'languages'
 		);
 	}

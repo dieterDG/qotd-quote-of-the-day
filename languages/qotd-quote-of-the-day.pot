@@ -16,7 +16,7 @@ msgstr ""
 "Language: \n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "X-Generator: Manual\n"
-"X-Domain: qotd\n"
+"X-Domain: qotd-quote-of-the-day\n"
 
 #. Plugin Name of the plugin
 msgid "QOTD (Quote of the Day)"

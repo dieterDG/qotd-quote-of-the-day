@@ -7,7 +7,7 @@
   "category": "widgets",
   "icon": "format-quote",
   "description": "Displays the daily quote dynamically via REST API.",
-  "textdomain": "qotd",
+  "textdomain": "qotd-quote-of-the-day",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css"
 }

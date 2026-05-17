@@ -1,4 +1,4 @@
-=== QOTD – Quote of the Day ===
+=== QOTD - Quote of the Day ===
 Contributors: dietergeiling
 Tags: quote, quotes, quote of the day, shortcode, daily quote
 Requires at least: 6.0
