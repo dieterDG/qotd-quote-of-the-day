@@ -43,7 +43,7 @@ The plugin uses a deterministic algorithm: `crc32(date + site_url)` maps today's
 
 **CSS structure:**
 
-The plugin does not ship its own frontend CSS. Style the output using your theme:
+The plugin does not style the quote output — all visual styling is left to your theme. The only included CSS handles the skeleton loader during page load.
 
 `.qotd` — outer wrapper
 `.qotd__text` — the quote text
