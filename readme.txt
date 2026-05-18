@@ -72,7 +72,7 @@ All styling of the output (`.qotd`, `.qotd__text`, `.qotd__separator`, `.qotd__a
 
 No. The quote is selected once per day based on the current date. All visitors see the same quote throughout the day, regardless of caching.
 
-= Why the current quote may change =
+= Why might the current quote change? =
 
 The quote of the day is selected based on the date and the total number of published quotes. Adding, deleting, or unpublishing a quote may cause today's displayed quote to change. From the next day on, everything works as normal again.
 
@@ -107,6 +107,14 @@ All plugin data is permanently removed: all quote posts, their meta fields, and 
 = Is the plugin available in German? =
 
 Yes. The plugin is fully translated into German (de_DE). The text domain is `qotd`.
+
+= Does the plugin work when the REST API is disabled? =
+
+The plugin loads the daily quote via a REST API request in the visitor's browser. If the REST API is restricted or disabled for unauthenticated visitors, the quote will not be displayed.
+
+Most performance and security plugins that restrict the REST API also provide a way to whitelist specific endpoints. Add `qotd/v1/today` as an exception to restore functionality. The exact method depends on the plugin or server configuration used — please refer to its documentation for details.
+
+Note: If you are using Perfmatters, the plugin registers the exception automatically — no manual configuration needed.
 
 == Screenshots ==
 
