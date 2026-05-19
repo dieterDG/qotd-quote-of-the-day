@@ -751,8 +751,8 @@ final class QOTD_Plugin
 		}
 
 		$doc_url = get_user_locale() === 'de_DE'
-			? 'https://qotd-plugin.com/de/docs/'
-			: 'https://qotd-plugin.com/docs/';
+			? 'https://qotd-plugin.com/de/docs'
+			: 'https://qotd-plugin.com/docs';
 	?>
 		<div class="notice notice-info">
 			<p>
@@ -865,8 +865,8 @@ final class QOTD_Plugin
 							<span class="dashicons dashicons-external" style="vertical-align:middle;margin-right:4px;" aria-hidden="true"></span>
 							<?php
 							$css_doc_url = get_user_locale() === 'de_DE'
-								? 'https://qotd-plugin.com/de/docs/css-anpassung/'
-								: 'https://qotd-plugin.com/docs/css-styling/';
+								? 'https://qotd-plugin.com/de/docs/css-anpassung'
+								: 'https://qotd-plugin.com/docs/css-styling';
 							echo wp_kses(
 								sprintf(
 									/* translators: %s: URL to the CSS styling documentation page */
