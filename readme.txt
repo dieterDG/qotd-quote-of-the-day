@@ -116,6 +116,10 @@ Most performance and security plugins that restrict the REST API also provide a 
 
 Note: If you are using Perfmatters, the plugin registers the exception automatically — no manual configuration needed.
 
+= Does the plugin work with LiteSpeed Cache? =
+
+Yes. However, if the REST API cache is enabled, the quote may not change daily as expected. To fix this, set "Default REST TTL" to 0 under LiteSpeed Cache → Cache settings. A fix for automatic compatibility is included in an upcoming LiteSpeed Cache release.
+
 == Screenshots ==
 
 1. The quote output on the frontend — styled with a custom theme.
